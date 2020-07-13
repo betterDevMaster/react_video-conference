@@ -7,7 +7,7 @@ const DraggableContainer = (props)=>{
     useEffect(()=>{
         console.log("Attach draggable event for container")
         const ele = attachDraggableEvent(props.id, props.isZoom)
-        setScreenPositionWithChildElement(ele)
+        // setScreenPositionWithChildElement(ele)
         document.g_currScale = 1
     },[]);
     function attachDraggableEvent(elementId, zoomable){
@@ -28,17 +28,17 @@ const DraggableContainer = (props)=>{
         }
         return ele
     }
-    function setScreenPositionWithChildElement(ele) {
-        setTimeout(function(){ 
-            const eleScreen = document.getElementById('screen_me');
-            // console.log('screen_me ------------- ',eleScreen, ele)
-            console.log(eleScreen.offsetLeft, eleScreen.offsetTop, window.screen.availWidth, window.screen.availHeight)
-            ele.style.left = (width()/2 - eleScreen.offsetLeft) + 'px'
-            ele.style.top = (height()/2 - eleScreen.offsetTop - 50) + 'px'
-            correctPos();
-            clearTimeout()
-        }, 3000);
-    }
+    // function setScreenPositionWithChildElement(ele) {
+    //     setTimeout(function(){ 
+    //         const eleScreen = document.getElementById('screen_me');
+    //         // console.log('screen_me ------------- ',eleScreen, ele)
+    //         console.log(eleScreen.offsetLeft, eleScreen.offsetTop, window.screen.availWidth, window.screen.availHeight)
+    //         ele.style.left = (width()/2 - eleScreen.offsetLeft) + 'px'
+    //         ele.style.top = (height()/2 - eleScreen.offsetTop - 50) + 'px'
+    //         correctPos();
+    //         clearTimeout()
+    //     }, 3000);
+    // }
     function width(){
         return(window.innerWidth)?
         window.innerWidth:
@@ -54,15 +54,15 @@ const DraggableContainer = (props)=>{
     // }
     const onMouseDown = (e)=>{
         var ele = document.elementFromPoint(e.x, e.y);
-        // console.log('onMouseDown-----------', ele)
+        // console.log('onMouseDown-----------', ele, ele.id)
 
-        if (ele.nodeName === 'VIDEO') {
-            ele = ele.parentElement
-            // ele.videoDraggable ? console.log('me-------') : console.log('other------------')
-            // if (ele.id != "screen_me")
-            //     return;
-        }
-        if(e.buttons === 1 && e.button === 0 ){
+        // if (ele.nodeName === 'VIDEO') {
+        //     ele = ele.parentElement
+        //     // ele.videoDraggable ? console.log('me-------') : console.log('other------------')
+        //     // if (ele.id != "screen_me")
+        //     //     return;
+        // }
+        if(e.buttons === 1 && e.button === 0 && ele.id === "background_div"){
             setCurrentDragElement(ele, e);
         }
     }
@@ -73,12 +73,12 @@ const DraggableContainer = (props)=>{
         //     return
 
         // if( ele && ele.dragInfo && e.buttons === 1 && e.button === 0 ) {
-        if( ele && ele.dragInfo && e.buttons === 1 && e.button === 0 ) {
+        if( ele && ele.dragInfo && e.buttons === 1 && e.button === 0 && ele.id === "background_div") {
+        // console.log('onMouseMove-----------', ele, ele.id, document.g_currScale)
                 
                 // if (e.id === "background_div") {
                 ele.style.zoom = document.g_currScale
                 const newPos = calcCurrentPos(ele, e)
-                console.log('onMouseMove-----------', newPos, document.g_currScale)
                 ele.style.left = newPos.x + 'px';
                 ele.style.top = newPos.y + 'px';
             // }
@@ -94,11 +94,11 @@ const DraggableContainer = (props)=>{
             ele.style.left = newPos.x + 'px';
             ele.style.top = newPos.y + 'px';
 
-            if (ele.id != props.id) {
-                WebRTC.getInstance().myPosition.x += (e.x - ele.dragInfo.firstPos.x)
-                WebRTC.getInstance().myPosition.y += (e.y - ele.dragInfo.firstPos.y)
-                WebRTC.getInstance().updateMyPosition()
-            }
+            // if (ele.id != props.id) {
+            //     WebRTC.getInstance().myPosition.x += (e.x - ele.dragInfo.firstPos.x)
+            //     WebRTC.getInstance().myPosition.y += (e.y - ele.dragInfo.firstPos.y)
+            //     WebRTC.getInstance().updateMyPosition()
+            // }
             // console.log('dragEnd---------',currentDragObject)
         }
         setCurrentDragElement(null);

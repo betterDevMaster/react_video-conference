@@ -113,7 +113,7 @@ var peerPositions = []
 
 const calcualteMyPosition = (peerId, width, height, socketId)=>{
   if(peerPositions.length === 0){
-    const retPos = {x:width-100, y:height-100, peerId, socketId}
+    const retPos = {x:width/2, y:height/2, peerId, socketId}
     // const retPos = {x:width/2, y:height/2, peerId, socketId}
     peerPositions.push(retPos);
     console.log('msgData: ', peerPositions, width, height)
@@ -179,7 +179,10 @@ easyrtc.events.on("easyrtcMsg", function(connectionObj, message, callback, next)
           callback({msgType:'set_peer_position', msgData: pos})
         }
       })
-      // console.log('get_peer_position--------', peerPositions)
+      peerPositions = peerPositions.filter((c, index) => {
+        return peerPositions.indexOf(c) === index;
+      });
+      console.log('get_peer_position--------', peerPositions)
       return true;
     case 'set_peer_position':
       peerPositions.forEach(pos=>{
@@ -187,9 +190,11 @@ easyrtc.events.on("easyrtcMsg", function(connectionObj, message, callback, next)
           pos.x = message.msgData.position.x;
           pos.y = message.msgData.position.y
         }
-        // console.log({msgType:'set_peer_position', pos})
       })
-      
+      peerPositions = peerPositions.filter((c, index) => {
+        return peerPositions.indexOf(c) === index;
+      });
+      console.log({msgType:'set_peer_position', peerPositions})
   }
   connectionObj.events.emitDefault("easyrtcMsg", connectionObj, message, callback, next);
 });

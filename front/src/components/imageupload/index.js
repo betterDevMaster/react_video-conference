@@ -21,8 +21,6 @@ const ImageUpload = React.memo((props) => {
         dispatch({type: 'backgound_moving', value: {bgMoving: false} })
         WebRTC.getInstance().imagePosition({transform: nodeRef.current.parentNode.style.transform, name: props.image.name})
     }
-
-    console.log(props.image)
     if (nodeRef.current && props.image.transform) {
         nodeRef.current.parentNode.style.transform = props.image.transform;
     }

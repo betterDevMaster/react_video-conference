@@ -16,7 +16,7 @@ html {
 	-webkit-tap-highlight-color: transparent;
 	-ms-text-size-adjust: 100%;
 	-webkit-text-size-adjust: 100%;
-	word-break: break-word;
+	/* word-break: break-word; */
 }
 
 body {

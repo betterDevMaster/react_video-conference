@@ -303,7 +303,7 @@ class WebRTC {
                 // replace local stream
                 stream.getTracks().forEach((track)=>{local.addTrack(track)})
                 const video_me = document.getElementById(local.id)
-                console.log('video_me ----------',video_me)
+                // console.log('video_me ----------',video_me)
                 if(video_me)
                     window.easyrtc.setVideoObjectSrc(video_me, stream)
                 window.easyrtc.enableCamera(WebRTC.getInstance().enableCamera)
@@ -391,7 +391,7 @@ class WebRTC {
             if (msgType === 'chat') {
                 dispatch({type:'chat_add', value:{username: client.idToName(peerId), userid: peerId, text: content, align: 'left', time: Date.now()}})
             } else if (msgType === 'set_peer_position') {
-                WebRTC.getInstance().updatePeerPosition(peerId, content.position)
+                WebRTC.getInstance().updatePeerPosition(content)
             // Youtube Handle
             } else if (msgType === 'youtube-position') {
                 dispatch({type:'youtube_position', value:{username: client.idToName(peerId), name: content.name, videoId: peerId, transform: content.transform, 
@@ -456,15 +456,16 @@ class WebRTC {
         })
         .onStreamAccept(function(client, peerId, stream) {
             var peerName = client.idToName(peerId);
-            console.log('onStreamAccept: ', peerName, 'roomName = ', WebRTC.getInstance().roomName)
-            dispatch({type: 'user_add', value: {id: peerId, name: peerName, stream, defPosX: WebRTC.getInstance().visibleScreenWidth/2, defPosY: WebRTC.getInstance().visibleScreenHeight/2} })
-            WebRTC.getInstance().onStreamConfigurationChange(peerId);
-
+            
             window.easyrtc.sendServerMessage("get_peer_position", peerId,
                 function(msgType, position){
-                    WebRTC.getInstance().updatePeerPosition(peerId, position)
+                    console.log('onStreamAccept: ', peerName, 'roomName = ', WebRTC.getInstance().roomName)
+                    dispatch({type: 'user_add', value: {id: peerId, name: peerName, stream, defPosX: position.x, defPosY: position.y} })
+                    WebRTC.getInstance().onStreamConfigurationChange(peerId);
+                    
+                    // WebRTC.getInstance().updatePeerPosition(peerId, peerName, position)
                 }, function(errorCode, errorText){
-                    WebRTC.getInstance().updatePeerPosition(peerId, {x:0, y:0})
+                    // WebRTC.getInstance().updatePeerPosition(peerId, {x:0, y:0})
                });
             WebRTC.getInstance().youtubes.forEach((youtube)=>{
                 WebRTC.getInstance().client.sendPeerMessage(
@@ -503,17 +504,17 @@ class WebRTC {
             console.log('start local stream: ', userName, 'roomName = ',this.roomName)
             var stream = client.getLocalStream();
 
-            dispatch({type: 'user_add', value: {id: 'me', name: 'Me', stream, defPosX: WebRTC.getInstance().visibleScreenWidth/2, defPosY: WebRTC.getInstance().visibleScreenHeight/2} })
-            WebRTC.getInstance().onStreamConfigurationChange(); 
-            WebRTC.getInstance().client = client;
-
             window.easyrtc.sendServerMessage('get_my_position', {clientId: client.getId(), sWidth: WebRTC.getInstance().visibleScreenWidth, sHeight: WebRTC.getInstance().visibleScreenHeight},
             // window.easyrtc.sendServerMessage('get_my_position', {clientId: client.getId()},
                 function(msgType, position){
-                    // console.log('webrtc: ', position)
+                    // console.log('webrtc---------- ', position)
+                    dispatch({type: 'user_add', value: {id: 'me', name: 'Me', stream, defPosX: position.x, defPosY: position.y} })
+                    WebRTC.getInstance().onStreamConfigurationChange(); 
+                    WebRTC.getInstance().client = client;
+
                     WebRTC.getInstance().updateMyPosition(position)
                 }, function(errorCode, errorText){
-                    WebRTC.getInstance().updateMyPosition({x:0, y:0})
+                    // WebRTC.getInstance().updateMyPosition({x:0, y:0})
                 }
             );
                
@@ -587,42 +588,31 @@ class WebRTC {
             }
         });
     }
-    updatePeerPosition(peerId, position){
-        const setPos = ()=>{
-            const peer = document.getElementById('screen_'+peerId);
-            // console.log('updatePeerPosition ' , position)
-            if(peer){
-                // const {screenPos} = WebRTC.getInstance().calculatePositionWithScreen(position)
-                // console.log('calced position: ', screenPos)
-                peer.style.left = position.x + 'px'
-                peer.style.top = position.y + 'px'
-            }else{
-                setTimeout(setPos, 100)
-            }
-        };
-        setTimeout(setPos, 100)
-    }
-    // calculatePositionWithScreen(position) {
-    //     // console.log('calc: ', WebRTC.getInstance().visibleScreenWidth, WebRTC.getInstance().visibleScreenHeight)
-    //     if (position.x >= WebRTC.getInstance().visibleScreenWidth/2 - 50) 
-    //         position.x = WebRTC.getInstance().visibleScreenWidth/2 - 50
-    //     else if (position.x <= - WebRTC.getInstance().visibleScreenWidth/2 + 50)
-    //         position.x = - WebRTC.getInstance().visibleScreenWidth/2 + 50
-    //     if (position.y >= WebRTC.getInstance().visibleScreenHeight/2 - 50)
-    //         position.y = WebRTC.getInstance().visibleScreenHeight/2 - 50
-    //     else if (position.y <= - WebRTC.getInstance().visibleScreenHeight/2 + 50)
-    //         position.y = - WebRTC.getInstance().visibleScreenHeight/2 + 50
-    //     return { screenPos: position }
-    // }
+    updatePeerPosition(content){
+        console.log('---------updatePeerPosition------------', content)
+        WebRTC.getInstance().dispatch({type: 'user_position', value: {id: content.position.peerId, defPosX: content.position.x, defPosY: content.position.y} })
 
+        // const setPos = ()=>{
+        //     const peer = document.getElementById('screen_'+peerId);
+        //     if(peer){
+        //         peer.style.left = position.x + 'px'
+        //         peer.style.top = position.y + 'px'
+        //     }else{
+        //         setTimeout(setPos, 100)
+        //     }
+        // };
+        // setTimeout(setPos, 100)
+    }
     updateMyPosition( position ){
-        const me = document.getElementById('screen_me');
-        if(me){
+        // const me = document.getElementById('screen_me');
+        if(this.client){
             if(!position)
                 position = this.myPosition;
-            me.style.left = position.x + 'px';
-            me.style.top = position.y + 'px';
+            // me.style.left = position.x + 'px';
+            // me.style.top = position.y + 'px';
             this.myPosition = position;
+
+            console.log('updateMyposition------------------', position, this.client)
             this.client.sendPeerMessage({room: this.roomName}, 'set_peer_position', {id: this.client.getId(), position:this.myPosition});
         }
     }
