@@ -27,7 +27,7 @@ const Conference = React.memo(props => {
     // const bgMoveObj = useSelector(state=>state.screens.bgMoving);
     const videoObj = useSelector(state=>state.screens.videos);
     const imageObj = useSelector(state=>state.screens.images);
-    console.log(users)
+    // console.log(users)
     
 
     // const [wheelX, setWheelX] = useState(-1000)
@@ -68,6 +68,7 @@ const Conference = React.memo(props => {
     const handleWheelChangeValue = (value) => {
         setWheelChange(value)
     }
+    // console.log('wheelchange------------', wheelChange)
     return (
     <div data-v-12a888fb="" className="space">
         <Navbar onSetUserClose={handleSetUserClose} videoObj={videoObj} imageObj={imageObj} query={query} /> 
@@ -76,7 +77,7 @@ const Conference = React.memo(props => {
                 onWheelChange={handleWheelChangeValue}
             >
                 {
-                    users.map((user) => <Screen key={user.id} cur={wheelChange} user={user} />)
+                    users.map((user) => <Screen key={user.id} curScale={wheelChange} user={user} />)
                 }
                 {
                     videoObj.map((video) => <YoutubeUpload key={video.name} video={video} cur={wheelChange} userClose={userClose} room={query.space} />)

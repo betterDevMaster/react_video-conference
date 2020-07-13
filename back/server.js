@@ -179,8 +179,8 @@ easyrtc.events.on("easyrtcMsg", function(connectionObj, message, callback, next)
           callback({msgType:'set_peer_position', msgData: pos})
         }
       })
-      peerPositions = peerPositions.filter((c, index) => {
-        return peerPositions.indexOf(c) === index;
+      peerPositions = peerPositions.filter((c, peerId) => {
+        return peerPositions.indexOf(c) === peerId;
       });
       console.log('get_peer_position--------', peerPositions)
       return true;
@@ -191,8 +191,8 @@ easyrtc.events.on("easyrtcMsg", function(connectionObj, message, callback, next)
           pos.y = message.msgData.position.y
         }
       })
-      peerPositions = peerPositions.filter((c, index) => {
-        return peerPositions.indexOf(c) === index;
+      peerPositions = peerPositions.filter((c, peerId) => {
+        return peerPositions.indexOf(c) === peerId;
       });
       console.log({msgType:'set_peer_position', peerPositions})
   }
@@ -200,7 +200,7 @@ easyrtc.events.on("easyrtcMsg", function(connectionObj, message, callback, next)
 });
 easyrtc.events.on("roomLeave", function(connectionObj, roomName, callback){
   console.log('roomLeave: ', roomName)
-  // peerPositions = peerPositions.filter((peer)=>peer.socketId !== connectionObj.socket.id)
-  // console.log(peerPositions);
+  peerPositions = peerPositions.filter((peer)=>peer.socketId !== connectionObj.socket.id)
+  console.log(peerPositions);
   connectionObj.events.emitDefault("roomLeave", connectionObj, roomName, callback);
 });

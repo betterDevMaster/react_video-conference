@@ -7,8 +7,8 @@ const DraggableContainer = (props)=>{
     useEffect(()=>{
         console.log("Attach draggable event for container")
         const ele = attachDraggableEvent(props.id, props.isZoom)
-        // setScreenPositionWithChildElement(ele)
-        document.g_currScale = 1
+        setScreenPositionWithChildElement(ele)
+        // document.g_currScale = 1
     },[]);
     function attachDraggableEvent(elementId, zoomable){
         const ele = document.getElementById(elementId);
@@ -28,17 +28,25 @@ const DraggableContainer = (props)=>{
         }
         return ele
     }
-    // function setScreenPositionWithChildElement(ele) {
-    //     setTimeout(function(){ 
-    //         const eleScreen = document.getElementById('screen_me');
-    //         // console.log('screen_me ------------- ',eleScreen, ele)
-    //         console.log(eleScreen.offsetLeft, eleScreen.offsetTop, window.screen.availWidth, window.screen.availHeight)
-    //         ele.style.left = (width()/2 - eleScreen.offsetLeft) + 'px'
-    //         ele.style.top = (height()/2 - eleScreen.offsetTop - 50) + 'px'
-    //         correctPos();
-    //         clearTimeout()
-    //     }, 3000);
-    // }
+    function setScreenPositionWithChildElement(ele) {
+        new Promise((resolve, reject)=>{
+            const getMyVideo = ()=>{
+                const eleScreen = document.getElementById('screen_me');
+                if(eleScreen){
+                    resolve(eleScreen)
+                }else{
+                    setTimeout(getMyVideo, 100);
+                }
+            }
+            getMyVideo();
+        }).then(eleMyVideo=>{
+            // console.log(eleScreen.offsetLeft, eleScreen.offsetTop, window.screen.availWidth, window.screen.availHeight)
+            ele.style.left = (width()/2 - eleMyVideo.offsetLeft) + 'px'
+            ele.style.top = (height()/2 - eleMyVideo.offsetTop - 50) + 'px'
+            console.log("Correct Pos...",eleMyVideo.parentElement.style.transform, ele.style.left, ele.style.top, eleMyVideo.offsetLeft, eleMyVideo.offsetTop)
+            correctPos();
+        })
+    }
     function width(){
         return(window.innerWidth)?
         window.innerWidth:
@@ -125,11 +133,12 @@ const DraggableContainer = (props)=>{
             currZoom = e.deltaY < 0 ? Math.min(3, currZoom*1.1) : Math.max(1, currZoom*0.9)
             e.target.style.zoom = currZoom
             // setScale(currZoom);
-            document.g_currScale = currZoom
+            // document.g_currScale = currZoom
             handleWheelChangeValue(currZoom) // For react Tooltip
         }
     }
     const handleWheelChangeValue = (value) => {
+        console.log('handleWheelChangeValue-------', value)
         props.onWheelChange(value);   
     }
     return (

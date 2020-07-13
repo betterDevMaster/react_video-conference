@@ -563,23 +563,23 @@ class WebRTC {
         ).catch(function(err) {
             //log to console first 
             console.log(err); /* handle the error */
-            if (err.name == "NotFoundError" || err.name == "DevicesNotFoundError") {
+            if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
                 //required track is missing 
                 console.log('NotFoundError, DevicesNotFoundError')
-            } else if (err.name == "NotReadableError" || err.name == "TrackStartError") {
+            } else if (err.name === "NotReadableError" || err.name === "TrackStartError") {
                 //webcam or mic are already in use 
                 console.log('NotReadableError, TrackStartError')
-            } else if (err.name == "OverconstrainedError" || err.name == "ConstraintNotSatisfiedError") {
+            } else if (err.name === "OverconstrainedError" || err.name === "ConstraintNotSatisfiedError") {
                 //constraints can not be satisfied by avb. devices 
                 console.log('OverconstrainedError, ConstraintNotSatisfiedError')
-            } else if (err.name == "NotAllowedError" || err.name == "PermissionDeniedError") {
+            } else if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
                 //permission denied in browser 
                 console.log('Send screen share message')
                 _this.toggleScreenShare(true)
                 _this.dispatch({type: 'click_screenshare', value: 'on'});
                 _this.dispatch({type:'user_media', value: { id: 'me', type: 'screenshare', status: 'on'}})
                 document.getElementById('screenshare').src = '/static/media/screenshare-on.44d81ce8.svg'
-            } else if (err.name == "TypeError" || err.name == "TypeError") {
+            } else if (err.name === "TypeError" || err.name === "TypeError") {
                 //empty constraints object 
                 console.log('TypeError')
             } else {
@@ -589,7 +589,7 @@ class WebRTC {
         });
     }
     updatePeerPosition(content){
-        console.log('---------updatePeerPosition------------', content)
+        // console.log('---------updatePeerPosition------------', content)
         WebRTC.getInstance().dispatch({type: 'user_position', value: {id: content.position.peerId, defPosX: content.position.x, defPosY: content.position.y} })
 
         // const setPos = ()=>{
@@ -612,7 +612,7 @@ class WebRTC {
             // me.style.top = position.y + 'px';
             this.myPosition = position;
 
-            console.log('updateMyposition------------------', position, this.client)
+            // console.log('updateMyposition------------------', position, this.client)
             this.client.sendPeerMessage({room: this.roomName}, 'set_peer_position', {id: this.client.getId(), position:this.myPosition});
         }
     }

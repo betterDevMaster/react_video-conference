@@ -6,7 +6,7 @@ import { Rnd } from "react-rnd";
 import WebRTC from '../../webrtc';
 import './index.css';
 
-const currentDragObject = {obj:null, x:0, y:0, scale:1, dragStarted:false}
+// const currentDragObject = {obj:null, x:0, y:0, scale:1, dragStarted:false}
 
 const Screen = React.memo(props => {
     const screenid = 'screen_'+props.user.id 
@@ -28,7 +28,6 @@ const Screen = React.memo(props => {
         setFirstPosY(detail.y)
     }
     const handleStop = (e, detail) => {
-        console.log('handleStop-----------------', detail, firstPosX, firstPosY, WebRTC.getInstance().myPosition);
         WebRTC.getInstance().myPosition.x += (detail.x - firstPosX)
         WebRTC.getInstance().myPosition.y += (detail.y - firstPosY)
         WebRTC.getInstance().updateMyPosition()
@@ -50,26 +49,14 @@ const Screen = React.memo(props => {
         setYPos(posY)
     }
 
-    // // console.log('nodeRef--------------', nodeRef.current, WebRTC.getInstance().myPosition, props.user)
-    if (nodeRef.current) {
-        console.log('nodeRef--------------', nodeRef.current, props.user)
-        // nodeRef.current.parentNode.style.transform = props.user.transform;
+    if (nodeRef.current && props.user.id != 'me') {
+        // console.log('nodeRef--------------', nodeRef.current, props.user)
+        nodeRef.current.parentNode.style.transform = `translate(${props.user.defPosX}px, ${props.user.defPosY}px)`
     }
-    // if(nodeRef && nodeRef.current){
-    //     console.log('nodeRef--------------', nodeRef.current)
-    //     // nodeRef.updatePosition({x:xPos, y:yPos})
-    //     setTimeout(()=>nodeRef.current.updatePosition({x:xPos, y:yPos}),100)
-    // }
-    // let rnd;
-    // if(rnd){
-    //     console.log('update position', props.userid, xPos, yPos)
-    // }
-    // if(props.user.id !== 'me')
-        console.log('position',props.user.id, xPos, yPos)
+    // console.log(props.user)
     return (
         <Rnd
-            // ref={c => {if(c)rnd=c }}
-            ref={nodeRef}
+            noderef={nodeRef}
             // size={{ width: 100,  height: 100 }}
             default={{ x: xPos, y: yPos }}
             onDragStart={(e, d) => {handleStart(e, d)}}
@@ -77,12 +64,12 @@ const Screen = React.memo(props => {
                 calculateEdge(d.x, d.y)
                 handleStop(e, d)
             }}
-            scale={props.cur}   
+            scale={props.curScale}   
             lockAspectRatio={true}
             enableResizing={false}
             disableDragging={props.user.id != 'me' ? true : false}
         >
-            <div id={screenid} data-tip data-for={props.user.id} key={props.user.id} className='screen'
+            <div ref={nodeRef} id={screenid} data-tip data-for={props.user.id} key={props.user.id} className='screen'
                 style={{width: 100, height: 100, zIndex: props.user.id==='me'?50:25, borderRadius: '50%' }} 
                 tabIndex={0}  >
                 <video 
@@ -94,11 +81,11 @@ const Screen = React.memo(props => {
             </div>
             <ReactTooltip id={props.user.id} type="info"
                 overridePosition={ ({ left, top }) => {
-                        left = left/props.cur
-                        top = top/props.cur
-                        return { top, left }
-                    }
-                }
+                    console.log('reactToopTip--------------', props.curScale)
+                    left = left/Math.pow(props.curScale, 5)
+                    top = top/Math.pow(props.curScale, 5)
+                    return { top, left }
+                }}
             >
                 <span>{props.user.name}</span>
             </ReactTooltip>
