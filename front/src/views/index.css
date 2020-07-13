@@ -1,0 +1,133 @@
+/* .ent-div {
+    padding-bottom: 70px;
+}
+.sk-div {
+    color: rgb(44, 215, 154); display: none;
+}
+.spinner-container {
+    width: 50px;
+    height: 50px;
+    border: 2px solid;
+    border-radius: 12px;
+}
+.sk-spinner {
+    color: #2cd79a !important;
+    margin-left: -4px;
+    transform: translateX(14px);
+}
+.sk-fade-in {
+    animation: sk-fade-in 0.5s !important;
+    outline: none;
+}
+
+.with-parallax {
+    --translate-x:-557px; --translate-y:-966.641px; --map-scale:1; --back-scale:8; --back-z:-6px;
+}
+.publisher {
+    width: 128px; height: 128px; transform: translate3d(1453px, 1346.14px, 0px);
+}
+.audio-level-meter {
+    --color:hsl(245, 30%, 60%); --audio-level-scale:1.04; --opacity:0;
+}
+.user-initials {
+    background-color: rgb(127, 122, 184);
+}
+.OT_root .OT_publisher .OT_fit-mode-cover .OT_audio-only {
+    overflow: hidden;
+}
+.OT_widget-container {
+    width: 100%; height: 100%;
+}
+.OT_video-poster {
+    display: block;
+}
+.back {
+    width: 100vw;
+    height: 100vh;
+}
+.map-background {
+    background-image: url(../images/map-big@2x.44a3f15c.png);
+    background-size: 340px 340px;
+    background-repeat: repeat;
+}
+.videoFrame {
+    width: 100%;
+    height: 100%;
+    transform: translate(50%, 50%);
+}
+
+.video-btn {
+    margin-left: 40px;
+}
+
+.audio-btn {
+    margin-left: 40px;
+}
+
+.members-container :hover {
+
+}
+.dropbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+} */
+
+
+
+
+
+
+
+
+
+
+
+
+.small-map-background {
+    position: absolute;
+    width: 3000px;
+    height: 3000px;
+    background-image: url(../images/map-small@2x.0c2a372b.png);
+    background-size: 740px 740px;
+    background-repeat: repeat;
+    transform-origin: 0 0;
+    z-index: 1;
+}
+.room-map-container {
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.viewport {
+    --translate-x: 0px;
+    --translate-y: 0px;
+    --map-scale: 1;
+    --back-scale: 4;
+    --back-z: -4px;
+    overflow: hidden;
+    flex-grow: 1;
+}
+.space .map {
+    background-image: url(../images/map-big@2x.44a3f15c.png);
+    /* background-size: 100% 100%;
+    background-repeat: no-repeat; */
+    background-size: cover;
+
+    background-size: 340px 340px;
+    background-repeat: repeat;
+
+    z-index: 1;
+}
+/* .viewport .map {
+    position: absolute;
+    cursor: default;
+    transform-origin: 0 0;
+    transform: translate(var(--translate-x),var(--translate-y)) scale(var(--map-scale));
+} 
+.viewport .dragging {
+    cursor: move;
+}*/
