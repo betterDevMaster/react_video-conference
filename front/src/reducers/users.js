@@ -59,7 +59,7 @@ const users = (state = [], action) => {
             return state.map((user) => {
                 if (user.id !== action.value.id)
                     return user;
-                console.log('----------user + action: ', user, action, {...user, ...action.value})
+                // console.log('----------user + action: ', user, action, {...user, ...action.value})
                 return {...user, ...action.value}
             });
         default:

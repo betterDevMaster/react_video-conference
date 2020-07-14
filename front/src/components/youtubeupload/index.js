@@ -9,6 +9,8 @@ import MicMute1 from '../../images/mic-mute1.svg'
 import closevideo from '../../images/closevideo.svg'
 import WebRTC from '../../webrtc';
 
+import Utils from '../../utils/position';
+
 const YoutubeUpload = React.memo(props => {
     const nodeRef = React.useRef(null);
     const videoRef = useRef(null);
@@ -47,18 +49,25 @@ const YoutubeUpload = React.memo(props => {
         const me_ele = document.getElementById('screen_me').parentElement
         const ele = document.getElementById('video_' + props.video.value)
 
-        if(me_ele && ele && ele.parentNode.style.transform){
-            var string = me_ele.style.transform 
-            var numbers = string.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
-            const screenMePos = {x: numbers[0], y: numbers[1]}
-            const videoPosArr = ele.parentNode.style.transform.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
-            const width = parseFloat(ele.parentNode.style.width.match(/\d+(?:\.\d+)?/g).map(Number))
-            const height = parseFloat(ele.parentNode.style.height.match(/\d+(?:\.\d+)?/g).map(Number))
+        // if(me_ele && ele && ele.parentNode.style.transform){
+        if(me_ele && ele){
+            // var string = me_ele.style.transform 
+            // var numbers = string.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
+            // const screenMePos = {x: numbers[0], y: numbers[1]}
 
-            const dist = getDistanceByRectAndPosition({left: videoPosArr[0], 
-                                                       right: videoPosArr[0] + width, 
-                                                       top: videoPosArr[1],
-                                                       bottom: videoPosArr[1] + height}, 
+            const screenMePos = Utils.getPositionFromTransform(me_ele);
+            const videoPos = Utils.getPositionFromTransform(ele.parentNode);
+
+            // const videoPosArr = ele.parentNode.style.transform.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
+            // const width = parseFloat(ele.parentNode.style.width.match(/\d+(?:\.\d+)?/g).map(Number))
+            // const height = parseFloat(ele.parentNode.style.height.match(/\d+(?:\.\d+)?/g).map(Number))
+            const width = ele.parentNode.clientWidth
+            const height = ele.parentNode.clientHeight
+
+            const dist = getDistanceByRectAndPosition({left: videoPos.x, 
+                                                       right: videoPos.x + width, 
+                                                       top: videoPos.y,
+                                                       bottom: videoPos.y + height}, 
                                                        screenMePos)
             var vol = dist===0?1:Math.max(0, Math.min(1, Math.pow((100 / dist), 4)))
             if (vol < 0.01) vol = 0

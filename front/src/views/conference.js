@@ -9,6 +9,7 @@ import WebRTC from '../webrtc';
 import Screen from '../components/screen';
 import YoutubeUpload from '../components/youtubeupload';
 import ImageUpload from '../components/imageupload';
+import Tip from '../components/tip';
 
 import img_small from '../images/map-small@2x.0c2a372b.png';
 import img_big from '../images/map-big@2x.44a3f15c.png';
@@ -54,6 +55,7 @@ const Conference = React.memo(props => {
                 }
             </DraggableContainer>
         </div>
+        <Tip />
     </div>
     );
 })
