@@ -44,8 +44,13 @@ function VideoDialog(props){
 
         const videoId = getId(video.value);
 
-        dispatch({type: 'youtube_add', value:{name: videoId, id: 'me', username: props.uname, value: videoId}})
-        WebRTC.getInstance().youtubeAdd({videoId: videoId, name: videoId, username: props.uname})
+        const back_left = document.getElementById('background_div').style.left.match(/\d+(?:\.\d+)?/g).map(Number);
+        const back_top = document.getElementById('background_div').style.top.match(/\d+(?:\.\d+)?/g).map(Number);
+        const calc_def_x = back_left[0] + document.getElementById('foreground_div').offsetWidth/2 - 382/2
+        const calc_def_y = back_top[0] + document.getElementById('foreground_div').offsetHeight/2 - 214/2 - 22
+
+        dispatch({type: 'youtube_add', value:{name: videoId, id: 'me', username: props.uname, value: videoId, defX: calc_def_x, defY: calc_def_y}})
+        WebRTC.getInstance().youtubeAdd({videoId: videoId, name: videoId, username: props.uname, defX: calc_def_x, defY: calc_def_y})
 
         video.value = ''
         window.$('#videodialog').plainModal('close')

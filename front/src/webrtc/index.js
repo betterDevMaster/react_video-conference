@@ -395,19 +395,20 @@ class WebRTC {
             // Youtube Handle
             } else if (msgType === 'youtube-position') {
                 dispatch({type:'youtube_position', value:{username: client.idToName(peerId), name: content.name, videoId: peerId, transform: content.transform, 
-                    videoWidth: content.videoWidth, videoHeight: content.videoHeight}})
+                    width: content.width, height: content.height}})
             } else if (msgType === 'youtube-play') {
                 dispatch({type:'youtube_play', value:{ name: content.name, videoplay: content.videoplay, curtime: content.curtime, videoplaying: content.videoplaying}})
             } else if (msgType === 'youtube-add') {
-                dispatch({type:'youtube_add', value:{name: content.name, id: peerId, value: content.videoId}})
+                dispatch({type:'youtube_add', value:{name: content.name, id: peerId, value: content.videoId, defX: content.defX, defY: content.defY}})
             } else if (msgType === 'youtube-remove') {
                 console.log('youtbut_remove: ', content)
                 dispatch({type:'youtube_remove', name:content.name})
             // Image Handle
             } else if (msgType === 'image-position') {
-                dispatch({type:'image_position', value:{username: client.idToName(peerId), name: content.name, imageid: peerId, transform: content.transform}})
+                dispatch({type:'image_position', value:{username: client.idToName(peerId), name: content.name, imageid: peerId, transform: content.transform, 
+                    width: content.width, height: content.height}})
             } else if (msgType === 'image-add') {
-                dispatch({type:'image_add', value:{name: content.name, id: peerId, value: content.imageId}})
+                dispatch({type:'image_add', value:{name: content.name, id: peerId, value: content.imageId, defX: content.defX, defY: content.defY}})
             } else if (msgType === 'image-remove') {
                 dispatch({type:'image_remove', name:content.name})
             // Navbar Handle

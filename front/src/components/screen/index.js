@@ -57,20 +57,20 @@ const Screen = React.memo(props => {
     return (
         <Rnd
             noderef={nodeRef}
-            // size={{ width: 100,  height: 100 }}
             default={{ x: xPos, y: yPos }}
             onDragStart={(e, d) => {handleStart(e, d)}}
             onDragStop={(e, d) => { 
                 calculateEdge(d.x, d.y)
                 handleStop(e, d)
             }}
-            scale={props.curScale}   
+            scale={props.curScale}  
+            style={{zIndex: props.user.id==='me'?50:25}}
             lockAspectRatio={true}
             enableResizing={false}
             disableDragging={props.user.id != 'me' ? true : false}
         >
             <div ref={nodeRef} id={screenid} data-tip data-for={props.user.id} key={props.user.id} className='screen'
-                style={{width: 100, height: 100, zIndex: props.user.id==='me'?50:25, borderRadius: '50%' }} 
+                style={{width: 100, height: 100, borderRadius: '50%' }} 
                 tabIndex={0}  >
                 <video 
                     className='video' 
@@ -81,7 +81,7 @@ const Screen = React.memo(props => {
             </div>
             <ReactTooltip id={props.user.id} type="info"
                 overridePosition={ ({ left, top }) => {
-                    console.log('reactToopTip--------------', props.curScale)
+                    // console.log('reactToopTip--------------', props.curScale)
                     left = left/Math.pow(props.curScale, 5)
                     top = top/Math.pow(props.curScale, 5)
                     return { top, left }

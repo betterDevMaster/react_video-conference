@@ -40,10 +40,12 @@ const DraggableContainer = (props)=>{
             }
             getMyVideo();
         }).then(eleMyVideo=>{
-            // console.log(eleScreen.offsetLeft, eleScreen.offsetTop, window.screen.availWidth, window.screen.availHeight)
-            ele.style.left = (width()/2 - eleMyVideo.offsetLeft) + 'px'
-            ele.style.top = (height()/2 - eleMyVideo.offsetTop - 50) + 'px'
-            console.log("Correct Pos...",eleMyVideo.parentElement.style.transform, ele.style.left, ele.style.top, eleMyVideo.offsetLeft, eleMyVideo.offsetTop)
+            const backPosArr = eleMyVideo.parentElement.style.transform.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
+            const left = backPosArr[0]
+            const top = backPosArr[1]
+            ele.style.left = (width()/2 - left) + 'px'
+            ele.style.top = (height()/2 - top - 50) + 'px'
+            // console.log("Correct Pos...",eleMyVideo.parentElement.style.transform, ele.style.left, ele.style.top, eleMyVideo.offsetLeft, eleMyVideo.offsetTop)
             correctPos();
         })
     }

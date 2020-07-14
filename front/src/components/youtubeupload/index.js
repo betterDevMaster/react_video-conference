@@ -44,23 +44,26 @@ const YoutubeUpload = React.memo(props => {
 
     }
     function onTimer(){
-        const me_ele = document.getElementById('screen_me')
+        const me_ele = document.getElementById('screen_me').parentElement
         const ele = document.getElementById('video_' + props.video.value)
 
         if(me_ele && ele && ele.parentNode.style.transform){
-            const screenMePos = {x: parseFloat(me_ele.style.left), y: parseFloat(me_ele.style.top)}
+            var string = me_ele.style.transform 
+            var numbers = string.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
+            const screenMePos = {x: numbers[0], y: numbers[1]}
             const videoPosArr = ele.parentNode.style.transform.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
-            const videoWidth = parseFloat(ele.parentNode.style.width.match(/\d+(?:\.\d+)?/g).map(Number))
-            const videoHeight = parseFloat(ele.parentNode.style.height.match(/\d+(?:\.\d+)?/g).map(Number))
+            const width = parseFloat(ele.parentNode.style.width.match(/\d+(?:\.\d+)?/g).map(Number))
+            const height = parseFloat(ele.parentNode.style.height.match(/\d+(?:\.\d+)?/g).map(Number))
 
             const dist = getDistanceByRectAndPosition({left: videoPosArr[0], 
-                                                       right: videoPosArr[0] + videoWidth, 
+                                                       right: videoPosArr[0] + width, 
                                                        top: videoPosArr[1],
-                                                       bottom: videoPosArr[1] + videoHeight}, 
+                                                       bottom: videoPosArr[1] + height}, 
                                                        screenMePos)
             var vol = dist===0?1:Math.max(0, Math.min(1, Math.pow((100 / dist), 4)))
             if (vol < 0.01) vol = 0
-            // console.log("distance: ", dist, vol* 100 * (ele.muted==='on' || ele.muted===undefined? 1: 0))
+            
+            // console.log("distance: ", dist, screenMePos, videoPosArr, width, height, vol* 100 * (ele.muted==='on' || ele.muted===undefined? 1: 0))
             
             if (videoRef && videoRef.current) {
                 videoRef.current.internalPlayer.setVolume(vol* 100 * (ele.muted==='on' || ele.muted===undefined? 1: 0));
@@ -73,13 +76,9 @@ const YoutubeUpload = React.memo(props => {
         dispatch({type: 'youtube_remove', name: value})
         WebRTC.getInstance().youtubeRemove({name: value})
     }
-    const handleStop = (e) => {
-        dispatch({type: 'backgound_moving', value: {bgMoving: false} })
-        // console.log('youtube transform: ', nodeRef.current.parentNode.style.transform, cWid, cHei)
-        WebRTC.getInstance().youtubePosition({transform: nodeRef.current.parentNode.style.transform, name: props.video.name, videoWidth: cWid, videoHeight: cHei})
-    }
-    const handleStart = (event) => {
-        dispatch({type: 'backgound_moving', value: {bgMoving: true} })
+    const handleStop = (width, height) => {
+        WebRTC.getInstance().youtubePosition({transform: nodeRef.current.parentNode.style.transform, name: props.video.name, width: width, height: height})
+        // WebRTC.getInstance().youtubePosition({transform: nodeRef.current.parentNode.style.transform, name: props.video.name, width: cWid, height: cHei})
     }
     const handleStateChange = () => {        
         realCurTime = videoRef.current.internalPlayer.getCurrentTime()
@@ -117,17 +116,6 @@ const YoutubeUpload = React.memo(props => {
         }
     }
 
-    if (nodeRef.current && props.video.transform) {
-        // console.log(props.video)
-        // console.log('other youtube transform: ', props.video.transform, props.video.videoWidth, props.video.videoHeight)
-        var string = props.video.transform 
-        var numbers = string.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
-        // console.log(numbers)
-        var { posX, posY } = calculateEdge(numbers[0], numbers[1], props.video.videoWidth, props.video.videoHeight, true)
-        // nodeRef.current.parentNode.style.transform = props.video.transform
-        nodeRef.current.parentNode.style.transform = `translate(${posX}px, ${posY}px)`
-    }
-
     if (props.video.id != 'me' && videoRef.current) {
         if (props.video.videoplay && props.video.videoplaying) {
             videoRef.current.internalPlayer.unMute()
@@ -140,18 +128,18 @@ const YoutubeUpload = React.memo(props => {
             videoRef.current.internalPlayer.pauseVideo()
         }
     }
-    function calculateEdge(posX, posY, videoWidth, videoHeight, otherRender = false) {
+    function calculateEdge(posX, posY, vdoWidth, vdoHeight, otherRender = false) {
         const width = document.getElementById('background_div').offsetWidth
         const height = document.getElementById('background_div').offsetHeight
 
-        if (posX >= width - videoWidth - 10)
-            posX = width - videoWidth - 10
-        if (posX < -width + 10)
-            posX = -width + 10
-        if (posY >= height - videoHeight - 60)
-            posY = height - videoHeight - 60
-        if (posY < -height + 30) // 22 is close header height
-            posY = -height + 30
+        if (posX >= width - vdoWidth - 10)
+            posX = width - vdoWidth - 10
+        if (posX < 10)
+            posX = 10
+        if (posY >= height - vdoHeight - 60)
+            posY = height - vdoHeight - 60
+        if (posY < 30) // 22 is close header height
+            posY = 30
 
         if (!otherRender) {
             setXPos(posX)
@@ -161,12 +149,27 @@ const YoutubeUpload = React.memo(props => {
         }
     }
 
-    const back_left = document.getElementById('background_div').style.left.match(/\d+(?:\.\d+)?/g).map(Number);
-    const back_top = document.getElementById('background_div').style.top.match(/\d+(?:\.\d+)?/g).map(Number);
+    if (nodeRef.current && props.video.transform) {
+        console.log('other youtube transform: ', props.video.transform, props.video.width, props.video.height)
+
+        nodeRef.current.parentNode.style.width = props.video.width + 'px';
+        nodeRef.current.parentNode.style.height = props.video.height + 'px';
+
+        var string = props.video.transform 
+        var numbers = string.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
+        var { posX, posY } = calculateEdge(numbers[0], numbers[1], props.video.width, props.video.height, true)
+        nodeRef.current.parentNode.style.transform = `translate(${posX}px, ${posY}px)`
+    }
+
+    if (nodeRef.current && !props.video.transform && props.video.defX) {
+        nodeRef.current.parentNode.style.transform = `translate(${props.video.defX}px, ${props.video.defY}px)`
+    }
+
     const [cWid, setCWid] = useState(382)
     const [cHei, setCHei] = useState(214)
-    const [xPos, setXPos] = useState(back_left[0] + document.getElementById('foreground_div').offsetWidth/2 - 382/2)
-    const [yPos, setYPos] = useState(back_top[0] + document.getElementById('foreground_div').offsetHeight/2 - 214/2 - 22)
+    const [xPos, setXPos] = useState(props.video.defX)
+    const [yPos, setYPos] = useState(props.video.defY)
+
 
     const opts = {
         origin: 'https://webrtc.bcisummit.com',
@@ -180,22 +183,26 @@ const YoutubeUpload = React.memo(props => {
             noderef={nodeRef}
             size={{ width: cWid,  height: cHei }}
             position={{ x: xPos, y: yPos }}
-            onDragStart={(e) => handleStart(e)}
-            onDragStop={(e, d) => { 
-                calculateEdge(d.x, d.y, cWid, cHei)
-                handleStop(e)
-            }}
             scale={props.cur}   
             lockAspectRatio={true}
             style = {{zIndex: props.video.id==='me'?10:5}}
+            disableDragging={props.video.id==='me' ? false: true}
+            enableResizing={{ top:false, right:false, bottom:false, left:false, 
+                topRight:props.video.id==='me' ? true : false, 
+                bottomRight:props.video.id==='me' ? true : false, 
+                bottomLeft:props.video.id==='me' ? true : false, 
+                topLeft:props.video.id==='me' ? true : false }}
+            onDragStop={(e, d) => { 
+                calculateEdge(d.x, d.y, cWid, cHei)
+                handleStop(cWid, cHei)
+            }}
             onResize={(e, direction, refval, delta, position) => {
                 var resizeWidth = parseInt(refval.style.width.match(/\d+/)[0]) // after resizing, remove 'px' string
                 var resizeHeight = parseInt(refval.style.height.match(/\d+/)[0]) // after resizing, remove 'px' string
-                
                 setCWid(resizeWidth)
                 setCHei(resizeHeight)
+                handleStop(resizeWidth, resizeHeight)
             }}
-            disableDragging={props.video.id==='me' ? false: true}
         >
             <div data-v-c1f79ed4="" data-v-6e496afa="" data-v-7e3fe256="" ref={nodeRef} key={props.video.id} id={videoid}
                 className="youtube-el" style={{width:'100%'}} style={{ zIndex: props.video.id==='me'?10:5 }}>

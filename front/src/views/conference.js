@@ -17,50 +17,17 @@ import './index.css';
 
 const Conference = React.memo(props => {
     useEffect(()=>{
-        console.log('useEffect -------------')
         WebRTC.getInstance().startConference(dispatch, null, query.space, query.uname);
     },[])
     
     const dispatch = useDispatch()
     const query = qs.parse(props.location.search);
     const users = useSelector(state=>state.users);
-    // const bgMoveObj = useSelector(state=>state.screens.bgMoving);
     const videoObj = useSelector(state=>state.screens.videos);
     const imageObj = useSelector(state=>state.screens.images);
-    // console.log(users)
-    
 
-    // const [wheelX, setWheelX] = useState(-1000)
-    // const [wheelY, setWheelY] = useState(-1000)
-    // const [wheelZ, setWheelZ] = useState(-1000)
-    // const [curScale, setCurScale] = useState(1)
-    // const [userClose, setUserClose] = useState(false);
-
-    // const [wheelX, setWheelX] = useState(-1000)
-    // const [wheelY, setWheelY] = useState(-1000)
-    // const [wheelZ, setWheelZ] = useState(-1000)
-    // const [curScale, setCurScale] = useState(1)
     const [userClose, setUserClose] = useState(false);
     const [wheelChange, setWheelChange] = useState(1);
-
-    // const handleWheel = (event) => {
-    //     var temp
-    //     if (event.previousScale < event.scale)
-    //         temp = 2
-    //     else
-    //         temp = -2
-
-    //     if (event.scale === event.options.maxScale || event.scale === event.options.minScale)
-    //         temp = 0
-
-    //     setCurScale(event.scale)
-    //     setWheelX(wheelX + event.scale * temp)
-    //     setWheelY(wheelY + event.scale * temp)
-    //     setWheelZ(wheelZ + event.scale * temp)
-    // }
-    // const handlePanning = (event) => {
-    //     event.options.disabled = bgMoveObj.bgMoving
-    // }
     
     const handleSetUserClose = (value) => {
         setUserClose(value)
@@ -68,7 +35,7 @@ const Conference = React.memo(props => {
     const handleWheelChangeValue = (value) => {
         setWheelChange(value)
     }
-    // console.log('wheelchange------------', wheelChange)
+
     return (
     <div data-v-12a888fb="" className="space">
         <Navbar onSetUserClose={handleSetUserClose} videoObj={videoObj} imageObj={imageObj} query={query} /> 
@@ -87,7 +54,7 @@ const Conference = React.memo(props => {
                 }
             </DraggableContainer>
         </div>
-    // </div>
+    </div>
     );
 })
 

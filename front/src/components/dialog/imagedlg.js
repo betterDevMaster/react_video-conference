@@ -17,8 +17,14 @@ function ImageDialog(props){
         setImagePreviewUrl(null)
     }
     const handleSubmit = (event) => {
-        dispatch({type: 'image_add', value:{name: fileName, id: 'me', username: props.uname, value: imagePreviewUrl}})
-        WebRTC.getInstance().imageAdd({imageId: imagePreviewUrl, name: fileName, username: props.uname})
+        const back_left = document.getElementById('background_div').style.left.match(/\d+(?:\.\d+)?/g).map(Number);
+        const back_top = document.getElementById('background_div').style.top.match(/\d+(?:\.\d+)?/g).map(Number);
+
+        var calc_def_x = back_left[0] + document.getElementById('foreground_div').offsetWidth/2 - 275/2
+        var calc_def_y = back_top[0] + document.getElementById('foreground_div').offsetHeight/2 - 183/2 - 22
+        
+        dispatch({type: 'image_add', value:{name: fileName, id: 'me', username: props.uname, value: imagePreviewUrl, defX: calc_def_x, defY: calc_def_y}})
+        WebRTC.getInstance().imageAdd({imageId: imagePreviewUrl, name: fileName, username: props.uname, defX: calc_def_x, defY: calc_def_y})
 
         setImagePreviewUrl(null)
         window.$('#imagedialog').plainModal('close')
