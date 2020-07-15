@@ -56,7 +56,7 @@ const Screen = React.memo(props => {
         const eleBack = document.getElementById('background_div');
         const eleFore = document.getElementById('foreground_div');
 
-        if(ele) {
+        if(ele && !window.dragStart) {
             const posMe = Utils.getPositionFromTransform(ele.parentNode);
             const posBack = Utils.getPositionFromStyle(eleBack);
             const videoScreen = document.getElementById(props.user.stream.id);
@@ -68,22 +68,20 @@ const Screen = React.memo(props => {
                 bottom: -posBack.y + eleFore.clientHeight/document.g_currScale}
             var inRect = Utils.isInRect(viewRect, posMe)
             if(!inRect){
+                if (eleSmall.childNodes.length === 0) {
+                    eleFore.appendChild(eleSmall);
+                    eleSmall.appendChild(videoScreen);
+                    eleSmall.style.display = 'inline-block'
+                    ele.parentNode.style.display = 'none';
+                } 
                 const smallPos = getDistanceByRectAndPosition(
                     Utils.multiplyPosition(Utils.addPosition(posMe, posBack), document.g_currScale), 
                     eleFore.clientWidth,
                     eleFore.clientHeight
                 )
-                
                 Utils.setPositionOfHtmlElement(eleSmall, smallPos);
-                if (eleSmall.childNodes.length === 0) {
-                    eleSmall.appendChild(videoScreen);
-                    eleSmall.style.display = 'inline-block'
-                    ele.parentNode.style.display = 'none';
-                    eleFore.appendChild(eleSmall);
-                } 
 
-            }
-            if (inRect) {
+            } else {
                 eleSmall.style.display = 'none'
                 ele.parentNode.style.display = 'inline-block';
                 document.getElementById(screenid).appendChild(videoScreen)
@@ -106,29 +104,42 @@ const Screen = React.memo(props => {
     }
 
     const handleStart = (ev, detail) => {
+        window.dragStart = true
         setFirstPosX(detail.x)
         setFirstPosY(detail.y)
     }
     const handleStop = (e, detail) => {
+        window.dragStart = false
         WebRTC.getInstance().myPosition.x += (detail.x - firstPosX)
         WebRTC.getInstance().myPosition.y += (detail.y - firstPosY)
         WebRTC.getInstance().updateMyPosition()
     }
-    const calculateEdge = (posX, posY) => {
-        const width = document.getElementById('background_div').offsetWidth
-        const height = document.getElementById('background_div').offsetHeight
+    // const calculateEdge = (posX, posY) => {
+    //     const width = document.getElementById('foreground_div').offsetWidth
+    //     const height = document.getElementById('foreground_div').offsetHeight
 
-        if (posX >= width - 100 - 10)
-            posX = width - 100 - 10
-        if (posX < -width + 10)
-            posX = -width + 10
-        if (posY >= height - 100 - 60)
-            posY = height - 100 - 60
-        if (posY < -height + 30) // 22 is close header height
-            posY = -height + 30
+    //     if (posX >= width - 100 - 10)
+    //         posX = width - 100 - 10
+    //     if (posX < -width + 10)
+    //         posX = -width + 10
+    //     if (posY >= height - 100 - 60)
+    //         posY = height - 100 - 60
+    //     if (posY < -height + 30) // 22 is close header height
+    //         posY = -height + 30
 
-        setXPos(posX)
-        setYPos(posY)
+    //     setXPos(posX)
+    //     setYPos(posY)
+    // }
+    function calculateEdge(posX, posY) {
+        const ele = document.getElementById('foreground_div')
+        const back = document.getElementById('background_div')
+        const width = ele.clientWidth
+        const height = ele.clientHeight
+        const pos = Utils.addPosition({x:posX, y:posY}, Utils.getPositionFromStyle(back))
+        console.log({x: posX, y: Math.max(50, Math.min(height, pos.y))} )
+        
+
+        return {x: posX, y: Math.max(50, Math.min(height, pos.y))}
     }
 
     if (nodeRef.current && props.user.id != 'me') {
@@ -143,8 +154,13 @@ const Screen = React.memo(props => {
                 default={{ x: xPos, y: yPos }}
                 onDragStart={(e, d) => {handleStart(e, d)}}
                 onDragStop={(e, d) => { 
-                    calculateEdge(d.x, d.y)
+                    // calculateEdge(d.x, d.y)
                     handleStop(e, d)
+                }}
+                onDrag = {(e,d) => {
+                    // console.log(e)
+                    // e.preventDefault()
+                    // calculateEdge(d.x, d.y)
                 }}
                 scale={props.curScale}  
                 style={{zIndex: props.user.id==='me'?50:25}}
@@ -190,7 +206,7 @@ const Screen = React.memo(props => {
                 </ReactTooltip> */}
             </Rnd>
             <div id={smallScreenId} className='screen' data-tip data-for={props.user.id} key={props.user.id}
-                style={{width: 50, height: 50, borderRadius: '50%', position: 'absolute', left: 0, top: 0, display: 'none', marginLeft:25, marginTop:25 }} >
+                style={{width: 50, height: 50, borderRadius: '50%', position: 'absolute', left: 0, top: 0, display: 'none', marginLeft:25, marginTop:25, zIndex: props.user.id==='me'?50:25 }} >
             </div>
         </>
     );

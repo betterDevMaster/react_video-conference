@@ -84,7 +84,24 @@
 
 
 
-
+.sk-div {
+    color: rgb(44, 215, 154); display: none;
+}
+.spinner-container {
+    width: 50px;
+    height: 50px;
+    border: 2px solid;
+    border-radius: 12px;
+}
+.sk-spinner {
+    color: #2cd79a !important;
+    margin-left: -4px;
+    transform: translateX(14px);
+}
+.sk-fade-in {
+    animation: sk-fade-in 0.5s !important;
+    outline: none;
+}
 
 .small-map-background {
     position: absolute;

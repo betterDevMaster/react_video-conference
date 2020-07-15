@@ -1,4 +1,3 @@
-import { UserColors } from './users'
 const chats = (state = [], action) => {
     switch(action.type){
         case "chat_add":
@@ -11,7 +10,7 @@ const chats = (state = [], action) => {
                 }, 200);
             return [
                 ...state,
-                { ...action.value, key: state.length, color: UserColors[action.value.userid]}
+                { ...action.value, key: state.length}
             ]
         default:
             return state

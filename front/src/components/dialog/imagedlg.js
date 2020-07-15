@@ -23,8 +23,8 @@ function ImageDialog(props){
         var calc_def_x = back_left[0] + document.getElementById('foreground_div').offsetWidth/2 - 275/2
         var calc_def_y = back_top[0] + document.getElementById('foreground_div').offsetHeight/2 - 183/2 - 22
         
-        dispatch({type: 'image_add', value:{name: fileName, id: 'me', username: props.uname, value: imagePreviewUrl, defX: calc_def_x, defY: calc_def_y}})
-        WebRTC.getInstance().imageAdd({imageId: imagePreviewUrl, name: fileName, username: props.uname, defX: calc_def_x, defY: calc_def_y})
+        dispatch({type: 'image_add', value:{name: fileName, id: 'me', username: props.uname, value: imagePreviewUrl, transform: `translate(${calc_def_x}px, ${calc_def_y}px)`, width: 275, height: 183, defX: calc_def_x, defY: calc_def_y}})
+        WebRTC.getInstance().imageAdd({imageId: imagePreviewUrl, name: fileName, username: props.uname, transform: `translate(${calc_def_x}px, ${calc_def_y}px)`, width: 275, height: 183, defX: calc_def_x, defY: calc_def_y})
 
         setImagePreviewUrl(null)
         window.$('#imagedialog').plainModal('close')

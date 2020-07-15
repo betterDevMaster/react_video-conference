@@ -148,9 +148,9 @@ class WebRTC {
             this.client.sendPeerMessage({room: this.roomName}, 'youtube-play', value);
     }
     youtubeAdd (value) {
-        value.transform = 'translate(0px, 0px)'
-        value.videoWidth = 382
-        value.videoHeight = 214
+        // value.transform = 'translate(0px, 0px)'
+        // value.videoWidth = 382
+        // value.videoHeight = 214
         WebRTC.getInstance().youtubes.push(value)
         if(WebRTC.getInstance().client)
             WebRTC.getInstance().client.sendPeerMessage({room: this.roomName}, 'youtube-add', value);
@@ -163,7 +163,7 @@ class WebRTC {
         })
     }
     imageAdd (value) {
-        value.transform = 'translate(0px, 0px)';
+        // value.transform = 'translate(0px, 0px)';
         WebRTC.getInstance().images.push(value)
         if(WebRTC.getInstance().client)
             WebRTC.getInstance().client.sendPeerMessage({room: this.roomName}, 'image-add', value);
@@ -395,20 +395,20 @@ class WebRTC {
             // Youtube Handle
             } else if (msgType === 'youtube-position') {
                 dispatch({type:'youtube_position', value:{username: client.idToName(peerId), name: content.name, videoId: peerId, transform: content.transform, 
-                    width: content.width, height: content.height}})
+                    width: content.width, height: content.height, defX: content.defX, defY: content.defY}})
             } else if (msgType === 'youtube-play') {
                 dispatch({type:'youtube_play', value:{ name: content.name, videoplay: content.videoplay, curtime: content.curtime, videoplaying: content.videoplaying}})
             } else if (msgType === 'youtube-add') {
-                dispatch({type:'youtube_add', value:{name: content.name, id: peerId, value: content.videoId, defX: content.defX, defY: content.defY}})
+                dispatch({type:'youtube_add', value:{name: content.name, id: peerId, value: content.videoId, transform: content.transform, width: content.width, height: content.height, defX: content.defX, defY: content.defY}})
             } else if (msgType === 'youtube-remove') {
                 console.log('youtbut_remove: ', content)
                 dispatch({type:'youtube_remove', name:content.name})
             // Image Handle
             } else if (msgType === 'image-position') {
                 dispatch({type:'image_position', value:{username: client.idToName(peerId), name: content.name, imageid: peerId, transform: content.transform, 
-                    width: content.width, height: content.height}})
+                    width: content.width, height: content.height, defX: content.defX, defY: content.defY}})
             } else if (msgType === 'image-add') {
-                dispatch({type:'image_add', value:{name: content.name, id: peerId, value: content.imageId, defX: content.defX, defY: content.defY}})
+                dispatch({type:'image_add', value:{name: content.name, id: peerId, value: content.imageId, transform: content.transform, width: content.width, height: content.height, defX: content.defX, defY: content.defY}})
             } else if (msgType === 'image-remove') {
                 dispatch({type:'image_remove', name:content.name})
             // Navbar Handle
