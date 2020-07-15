@@ -11,7 +11,7 @@ const users = (state = [], action) => {
                 { ...action.value, media: {mic:'on', camera:'on'}}
             ]
         case "user_remove":
-            console.log('usre_remove----------', state, action, state.filter((user)=>user.id !== action.value.id))
+            // console.log('usre_remove: state----------', state, 'action----------', action, 'remove----------',state.filter((user)=>user.id !== action.value.id), '-------')
             return state.filter((user)=>user.id !== action.value.id);
         case "user_media":
             // console.log("user_media", action, state)

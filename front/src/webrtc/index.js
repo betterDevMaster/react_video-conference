@@ -497,6 +497,8 @@ class WebRTC {
             dispatch({type:'image_remove_by_id', peerId})
             dispatch({type:'youtube_remove_by_id', peerId})
 
+            // console.log('-------------oncStreamClose')
+            // WebRTC.getInstance().removeChild(peerId, client)
             dispatch({type:'user_remove', value: { id: peerId }});
 
             return;
@@ -522,6 +524,14 @@ class WebRTC {
             return;
         });
 
+    }
+    removeChild(peer, client) {
+        console.log('----------removeChild')
+        var container = document.getElementById('screen_' + peer);
+        var videoEl = peer.videoEl;   //it got video element
+        if (container && videoEl) {
+            container.removeChild(videoEl);   // my code is breaking here
+        }
     }
     sendMessage(message){
         this.client.sendPeerMessage({room: this.roomName}, 'chat', message);

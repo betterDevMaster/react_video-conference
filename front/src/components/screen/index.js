@@ -20,10 +20,10 @@ const Screen = React.memo(props => {
     const [firstPosX, setFirstPosX] = useState(0)
     const [firstPosY, setFirstPosY] = useState(0)
 
-    var normalScreenPos = true
+    var ele_Screen = document.getElementById('screen_' + props.user.id)
+
     useEffect(() => {
         var video = document.getElementById(props.user.stream.id);
-        
 
         if(video){
             window.easyrtc.setVideoObjectSrc(video, props.user.stream);
@@ -45,6 +45,7 @@ const Screen = React.memo(props => {
             ele.parentNode.style.transform = `translate(${screenCurrObjPos.x}px, ${screenCurrObjPos.y}px) scale(${scale_val})`
         
             var vol = dist===0?1:Math.max(0, Math.min(1, Math.pow((100 / dist), 4)))
+            // console.log('user volume----------', scale_val, vol)
             if (vol < 0.01) vol = 0
             
             ele.parentNode.firstElementChild.volume = isFinite(vol) ? vol : 1;
@@ -62,15 +63,17 @@ const Screen = React.memo(props => {
             const videoScreen = document.getElementById(props.user.stream.id);
             const eleSmall = document.getElementById(smallScreenId)
 
-            const viewRect = {   left: -posBack.x, 
+            const viewRect = {   
+                left: -posBack.x, 
                 top: -posBack.y, 
                 right:-posBack.x + eleFore.clientWidth/document.g_currScale, 
-                bottom: -posBack.y + eleFore.clientHeight/document.g_currScale}
+                bottom: -posBack.y + eleFore.clientHeight/document.g_currScale
+            }
             var inRect = Utils.isInRect(viewRect, posMe)
             if(!inRect){
                 if (eleSmall.childNodes.length === 0) {
-                    eleFore.appendChild(eleSmall);
                     eleSmall.appendChild(videoScreen);
+
                     eleSmall.style.display = 'inline-block'
                     ele.parentNode.style.display = 'none';
                 } 
@@ -84,7 +87,10 @@ const Screen = React.memo(props => {
             } else {
                 eleSmall.style.display = 'none'
                 ele.parentNode.style.display = 'inline-block';
-                document.getElementById(screenid).appendChild(videoScreen)
+            
+                const d = document.getElementById(screenid)
+                d.appendChild(videoScreen)
+
             }
         }
     }
@@ -97,9 +103,14 @@ const Screen = React.memo(props => {
     }
 
     function onTimer(){
+        // console.log('-------------onTimer')
+
         if(props.user.id !== 'me')
             setVolumeForNeighborhood();
-        setScaleByPosition();
+            
+        // console.log('ele_Screen-------------', ele_Screen)
+        // if (ele_Screen)
+        setScaleByPosition()
         setTimeout(onTimer, 50)
     }
 
@@ -114,38 +125,20 @@ const Screen = React.memo(props => {
         WebRTC.getInstance().myPosition.y += (detail.y - firstPosY)
         WebRTC.getInstance().updateMyPosition()
     }
-    // const calculateEdge = (posX, posY) => {
-    //     const width = document.getElementById('foreground_div').offsetWidth
-    //     const height = document.getElementById('foreground_div').offsetHeight
-
-    //     if (posX >= width - 100 - 10)
-    //         posX = width - 100 - 10
-    //     if (posX < -width + 10)
-    //         posX = -width + 10
-    //     if (posY >= height - 100 - 60)
-    //         posY = height - 100 - 60
-    //     if (posY < -height + 30) // 22 is close header height
-    //         posY = -height + 30
-
-    //     setXPos(posX)
-    //     setYPos(posY)
-    // }
     function calculateEdge(posX, posY) {
         const ele = document.getElementById('foreground_div')
         const back = document.getElementById('background_div')
         const width = ele.clientWidth
         const height = ele.clientHeight
         const pos = Utils.addPosition({x:posX, y:posY}, Utils.getPositionFromStyle(back))
-        console.log({x: posX, y: Math.max(50, Math.min(height, pos.y))} )
+        // console.log({x: posX, y: Math.max(50, Math.min(height, pos.y))} )
         
-
         return {x: posX, y: Math.max(50, Math.min(height, pos.y))}
     }
 
     if (nodeRef.current && props.user.id != 'me') {
         nodeRef.current.parentNode.style.transform = `translate(${props.user.defPosX}px, ${props.user.defPosY}px)`
     }
-
 
     return (
         <>
@@ -154,13 +147,8 @@ const Screen = React.memo(props => {
                 default={{ x: xPos, y: yPos }}
                 onDragStart={(e, d) => {handleStart(e, d)}}
                 onDragStop={(e, d) => { 
-                    // calculateEdge(d.x, d.y)
+                    calculateEdge(d.x, d.y)
                     handleStop(e, d)
-                }}
-                onDrag = {(e,d) => {
-                    // console.log(e)
-                    // e.preventDefault()
-                    // calculateEdge(d.x, d.y)
                 }}
                 scale={props.curScale}  
                 style={{zIndex: props.user.id==='me'?50:25}}
@@ -169,7 +157,8 @@ const Screen = React.memo(props => {
                 disableDragging={props.user.id != 'me' ? true : false}
             >
                 <div ref={nodeRef} id={screenid} data-tip data-for={props.user.id} key={props.user.id} className='screen'
-                    style={{width: 100, height: 100, borderRadius: '50%', marginLeft:-50, marginTop:-50 }} 
+                    style={{width: 100, height: 100, borderRadius: '50%', marginLeft:-50, marginTop:-50,
+                                border: props.user.id === 'me'?'2px solid #dcdb53':'2px solid' }} 
                     tabIndex={0}  >
                     <video 
                         className='video' 
@@ -192,22 +181,8 @@ const Screen = React.memo(props => {
                     >    
                     </video>
                 </div>
-                {/* <ReactTooltip id={props.user.id} type="info"
-                    overridePosition={ ({ left, top }) => {
-                        // left = left/Math.pow(props.curScale, 5)
-                        // top = top/Math.pow(props.curScale, 5)
-                        console.log("TIP0",left, top)
-                        left /= document.g_currScale
-                        top /= document.g_currScale
-                        return { top, left }
-                    }}
-                >
-                    <span>{props.user.name}</span>
-                </ReactTooltip> */}
             </Rnd>
-            <div id={smallScreenId} className='screen' data-tip data-for={props.user.id} key={props.user.id}
-                style={{width: 50, height: 50, borderRadius: '50%', position: 'absolute', left: 0, top: 0, display: 'none', marginLeft:25, marginTop:25, zIndex: props.user.id==='me'?50:25 }} >
-            </div>
+            
         </>
     );
 })

@@ -128,6 +128,7 @@ const YoutubeUpload = React.memo(props => {
         if (posY < 30) // 22 is close header height
             posY = 30
 
+        // console.log('----------', posX, posY, width, height)
         return {x: posX, y: posY}
     }
     if (props.video.id != 'me' && videoRef.current) {
@@ -144,7 +145,9 @@ const YoutubeUpload = React.memo(props => {
     }
 
     if (nodeRef.current && props.video.transform) {
-        console.log('other youtube transform: ', props.video.transform, props.video.width, props.video.height)
+        // console.log('other youtube transform: ', props.video.transform, props.video.width, props.video.height)
+
+        // console.log('----------first: ', props.video)
 
         nodeRef.current.parentNode.style.width = props.video.width + 'px';
         nodeRef.current.parentNode.style.height = props.video.height + 'px';
@@ -156,6 +159,8 @@ const YoutubeUpload = React.memo(props => {
     }
 
     if (nodeRef.current && !props.video.transform && props.video.defX) {
+        // console.log('---------- second:', props.video)
+     
         nodeRef.current.parentNode.style.transform = `translate(${props.video.defX}px, ${props.video.defY}px)`
     }
 

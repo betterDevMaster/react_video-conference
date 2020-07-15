@@ -54,6 +54,16 @@ const Conference = React.memo(props => {
                     imageObj.map((image) => <ImageUpload key={image.value} image={image} cur={wheelChange} userClose={userClose} room={query.space} />)
                 }
             </DraggableContainer>
+            {
+                users.map((user) => {
+                    return (
+                        <div id={'smallscreen_' + user.id} className='screen' data-tip data-for={user.id} key={user.id}
+                            style={{width: 50, height: 50, borderRadius: '50%', position: 'absolute', left: 0, top: 0, display: 'none', 
+                                    marginLeft:25, marginTop:25, zIndex: user.id==='me'?50:25, border: user.id==='me'?'2px solid #dcdb53':'2px solid' }} >
+                        </div>
+                    )
+                })
+            }
         </div>
         <Tip />
     </div>
