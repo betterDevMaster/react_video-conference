@@ -41,6 +41,7 @@ const users = (state = [], action) => {
                 { ...action.value, color, media: {mic:'on', camera:'on'}}
             ]
         case "user_remove":
+            console.log('usre_remove----------', state, action)
             delete UserColors[action.value.id];
             return state.filter((user)=>user.id !== action.value.id);
         case "user_media":

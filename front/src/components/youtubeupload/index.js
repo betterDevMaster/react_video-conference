@@ -46,7 +46,7 @@ const YoutubeUpload = React.memo(props => {
 
     }
     function onTimer(){
-        const me_ele = document.getElementById('screen_me').parentElement
+        const me_ele = document.getElementById('screen_me')
         const ele = document.getElementById('video_' + props.video.value)
 
         // if(me_ele && ele && ele.parentNode.style.transform){
@@ -55,7 +55,7 @@ const YoutubeUpload = React.memo(props => {
             // var numbers = string.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
             // const screenMePos = {x: numbers[0], y: numbers[1]}
 
-            const screenMePos = Utils.getPositionFromTransform(me_ele);
+            const screenMePos = Utils.getPositionFromTransform(me_ele.parentElement);
             const videoPos = Utils.getPositionFromTransform(ele.parentNode);
 
             // const videoPosArr = ele.parentNode.style.transform.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
@@ -86,7 +86,9 @@ const YoutubeUpload = React.memo(props => {
         WebRTC.getInstance().youtubeRemove({name: value})
     }
     const handleStop = (width, height) => {
+        // console.log('-----youtube Upload: ', nodeRef.current.parentNode.style.transform, props.video)
         WebRTC.getInstance().youtubePosition({transform: nodeRef.current.parentNode.style.transform, name: props.video.name, width: width, height: height})
+        dispatch({type: 'youtube_position', value: { transform: nodeRef.current.parentNode.style.transform, name: props.video.name, width: width, height: height } })
         // WebRTC.getInstance().youtubePosition({transform: nodeRef.current.parentNode.style.transform, name: props.video.name, width: cWid, height: cHei})
     }
     const handleStateChange = () => {        
@@ -150,6 +152,7 @@ const YoutubeUpload = React.memo(props => {
         if (posY < 30) // 22 is close header height
             posY = 30
 
+        console.log('calculateEdge----------',posX, posY, otherRender)
         if (!otherRender) {
             setXPos(posX)
             setYPos(posY)
@@ -174,6 +177,7 @@ const YoutubeUpload = React.memo(props => {
         nodeRef.current.parentNode.style.transform = `translate(${props.video.defX}px, ${props.video.defY}px)`
     }
 
+    console.log(props.video)
     const [cWid, setCWid] = useState(382)
     const [cHei, setCHei] = useState(214)
     const [xPos, setXPos] = useState(props.video.defX)
@@ -204,12 +208,20 @@ const YoutubeUpload = React.memo(props => {
             onDragStop={(e, d) => { 
                 calculateEdge(d.x, d.y, cWid, cHei)
                 handleStop(cWid, cHei)
+                console.log('--------onDragStop:', d)
             }}
             onResize={(e, direction, refval, delta, position) => {
                 var resizeWidth = parseInt(refval.style.width.match(/\d+/)[0]) // after resizing, remove 'px' string
                 var resizeHeight = parseInt(refval.style.height.match(/\d+/)[0]) // after resizing, remove 'px' string
+                
+                // setXPos(xPos)
+                // setYPos(yPos)
+
+                console.log('--------onResize: before: ', e, direction, refval, xPos, yPos, position)
                 setCWid(resizeWidth)
                 setCHei(resizeHeight)
+                
+                console.log('--------onResize: after: ', e, direction, refval, xPos, yPos, position)
                 handleStop(resizeWidth, resizeHeight)
             }}
         >
