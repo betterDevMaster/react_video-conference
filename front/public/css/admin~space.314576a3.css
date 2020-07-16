@@ -11,6 +11,8 @@
 	height: 50px;
 	min-height: 50px;
 	padding: 0 80px;
+	position: fixed;
+    width: 100%;
 }
 
 @media (max-width:767px) {

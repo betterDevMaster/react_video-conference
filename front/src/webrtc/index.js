@@ -10,10 +10,10 @@ class WebRTC {
     enableScreenShare = true
     enableCamera = true
     enableMic = true
-    // visibleScreenWidth = document.getElementsByClassName('space')[0].offsetWidth
-    // visibleScreenHeight = document.getElementsByClassName('space')[0].offsetHeight
-    visibleScreenWidth = document.getElementById('background_div').offsetWidth
-    visibleScreenHeight = document.getElementById('background_div').offsetHeight
+    visibleScreenWidth = document.getElementsByClassName('space')[0].offsetWidth
+    visibleScreenHeight = document.getElementsByClassName('space')[0].offsetHeight
+    // visibleScreenWidth = document.getElementById('background_div').offsetWidth
+    // visibleScreenHeight = document.getElementById('background_div').offsetHeight
 
     videoQualities = [
         {text:'SSM (30p - 128Kb/s)', value:{width: 160, height:120, frameRate: 10}},

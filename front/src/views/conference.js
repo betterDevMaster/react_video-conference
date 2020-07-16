@@ -17,59 +17,135 @@ import img_big from '../images/map-big@2x.44a3f15c.png';
 
 import './index.css';
 
+const InteractiveDiv = panAndZoomHoc('div');
+
 const Conference = React.memo(props => {
-    useEffect(()=>{
-        WebRTC.getInstance().startConference(dispatch, null, query.space, query.uname);
-    },[])
-    
     const dispatch = useDispatch()
     const query = qs.parse(props.location.search);
     const users = useSelector(state=>state.users);
     const videoObj = useSelector(state=>state.screens.videos);
     const imageObj = useSelector(state=>state.screens.images);
-
     const [userClose, setUserClose] = useState(false);
-    const [wheelChange, setWheelChange] = useState(1);
     
+    const [foreWidth, setForeWidth] = useState(0);
+    const [foreHeight, setForeHeight] = useState(0);
+    useEffect(()=>{
+        WebRTC.getInstance().startConference(dispatch, null, query.space, query.uname);
+        const spaceEle = document.getElementsByClassName('space')
+        console.log('------------------',spaceEle[0].clientHeight)
+
+        setForeWidth(spaceEle[0].clientWidth)
+        setForeHeight(spaceEle[0].clientHeight)
+    },[])
+    
+    const [x, setX] = useState(0.5);
+    const [y, setY] = useState(0.5);
+    const [scale, setscale] = useState(1);
+
     const handleSetUserClose = (value) => {
         setUserClose(value)
     }
-    const handleWheelChangeValue = (value) => {
-        setWheelChange(value)
+
+    const handlePanAndZoom = (x, y, scale) => {
+        setX(x)
+        setY(y)
+        setscale(scale)
     }
 
+    const handlePanMove = (x, y) => {
+        setX(x)
+        setY(y)
+    }
+
+    const handleZoomEnd = () => { 
+        console.log('Zoom has ended.');
+    }
+
+    const transformPoint = (xVal, yVal) => {
+        return {
+            x: 0.5 + scale * (xVal - x),
+            y: 0.5 + scale * (yVal - y)
+        };
+    }
+    const p1 = transformPoint(0,0)
     return (
-    <div data-v-12a888fb="" className="space">
-        <Navbar onSetUserClose={handleSetUserClose} videoObj={videoObj} imageObj={imageObj} query={query} /> 
-        <div id='foreground_div' style={{position: 'relative', overflow: 'hidden', backgroundImage: `url(${img_small})`, width:'100%', height: '100%'}}>
-            <DraggableContainer id='background_div' width={3000} height={3000} isZoom={true} background={img_big}
-            // <DraggableContainer id='background_div' width={3200} height={1600} isZoom={true} background={img_big}
-                onWheelChange={handleWheelChangeValue}
-            >
-                {
-                    users.map((user) => <Screen key={user.id} curScale={wheelChange} user={user} />)
-                }
-                {
-                    videoObj.map((video) => <YoutubeUpload key={video.name} video={video} cur={wheelChange} userClose={userClose} room={query.space} />)
-                }
-                {
-                    imageObj.map((image) => <ImageUpload key={image.value} image={image} cur={wheelChange} userClose={userClose} room={query.space} />)
-                }
-            </DraggableContainer>
-            {
-                users.map((user) => {
-                    return (
-                        <div id={'smallscreen_' + user.id} className='screen' data-tip data-for={user.id} key={user.id}
-                            style={{width: 50, height: 50, borderRadius: '50%', position: 'absolute', left: 0, top: 0, display: 'none', 
-                                    marginLeft:25, marginTop:25, zIndex: user.id==='me'?50:25, border: user.id==='me'?'2px solid #dcdb53':'2px solid' }} >
-                        </div>
-                    )
-                })
-            }
+        <div data-v-12a888fb="" className="space">
+            <Navbar onSetUserClose={handleSetUserClose} videoObj={videoObj} imageObj={imageObj} query={query} /> 
+            <InteractiveDiv
+                id='interactive_div'
+                x={x}
+                y={y}
+                scale={scale}
+                scaleFactor={Math.sqrt(2)}
+                minScale={0.5}
+                maxScale={2}
+                onPanAndZoom={handlePanAndZoom}
+                ignorePanOutside
+                style={{ backgroundImage: `url(${img_small})`, overflow: 'hidden', width:'100%', height: '100%', position: 'relative' }}
+                onPanMove={handlePanMove}
+                onZoomEnd={handleZoomEnd}
+            >                    
+                <div style={{ backgroundImage: `url(${img_big})`, position: 'absolute', width: 500, height: 500,
+                        transform: `translate(${p1.x * foreWidth}px, ${p1.y * foreHeight}px)` }} >
+                    <span style={{width: 100, height: 100, backgroundColor: '#334332'}}>sdfsdfsdf</span>
+                </div>
+            
+            </InteractiveDiv>
         </div>
-        <Tip />
-    </div>
-    );
+    )
 })
 
 export default Conference
+
+    // useEffect(()=>{
+    //     WebRTC.getInstance().startConference(dispatch, null, query.space, query.uname);
+    // },[])
+    
+    // const dispatch = useDispatch()
+    // const query = qs.parse(props.location.search);
+    // const users = useSelector(state=>state.users);
+    // const videoObj = useSelector(state=>state.screens.videos);
+    // const imageObj = useSelector(state=>state.screens.images);
+
+    // const [userClose, setUserClose] = useState(false);
+    // const [wheelChange, setWheelChange] = useState(1);
+    
+    // const handleSetUserClose = (value) => {
+    //     setUserClose(value)
+    // }
+    // const handleWheelChangeValue = (value) => {
+    //     setWheelChange(value)
+    // }
+
+    // return (
+    // <div data-v-12a888fb="" className="space">
+    //     <Navbar onSetUserClose={handleSetUserClose} videoObj={videoObj} imageObj={imageObj} query={query} /> 
+    //     <div id='foreground_div' style={{position: 'relative', overflow: 'hidden', backgroundImage: `url(${img_small})`, width:'100%', height: '100%'}}>
+    //         <DraggableContainer id='background_div' width={3000} height={3000} isZoom={true} background={img_big}
+    //         // <DraggableContainer id='background_div' width={3200} height={1600} isZoom={true} background={img_big}
+    //             onWheelChange={handleWheelChangeValue}
+    //         >
+    //             {
+    //                 users.map((user) => <Screen key={user.id} curScale={wheelChange} user={user} />)
+    //             }
+    //             {
+    //                 videoObj.map((video) => <YoutubeUpload key={video.name} video={video} cur={wheelChange} userClose={userClose} room={query.space} />)
+    //             }
+    //             {
+    //                 imageObj.map((image) => <ImageUpload key={image.value} image={image} cur={wheelChange} userClose={userClose} room={query.space} />)
+    //             }
+    //         </DraggableContainer>
+    //         {
+    //             users.map((user) => {
+    //                 return (
+    //                     <div id={'smallscreen_' + user.id} className='screen' data-tip data-for={user.id} key={user.id}
+    //                         style={{width: 50, height: 50, borderRadius: '50%', position: 'absolute', left: 0, top: 0, display: 'none', 
+    //                                 marginLeft:25, marginTop:25, zIndex: user.id==='me'?50:25, border: user.id==='me'?'2px solid #dcdb53':'2px solid' }} >
+    //                     </div>
+    //                 )
+    //             })
+    //         }
+    //     </div>
+    //     <Tip />
+    // </div>
+    // );

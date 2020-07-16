@@ -22,6 +22,7 @@
     "react-spinkit": "^3.0.0",
     "react-tooltip": "^4.2.6",
     "react-youtube": "^7.11.2",
+    "react-zoom-pan-pinch": "^1.6.1",
     "redux": "^4.0.5"
   },
   "scripts": {
