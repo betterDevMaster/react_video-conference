@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 // import ReactDOM from 'react-dom';
 // import WebRTC from '../../webrtc';
 import {addPoint, offsetPoint, multiplyPoint, getZoom, calcCurrentPos, setCurrentDragElement, getCurrentDragElement,attachDraggableEvent} from './dragEvent'
+import Utils from '../../utils/position'
 
 const DraggableContainer = (props)=>{
     useEffect(()=>{
@@ -104,11 +105,21 @@ const DraggableContainer = (props)=>{
     }
     const onWheel = (e)=>{
         if(props.isZoom){
-            let currZoom = getZoom(e.target)
-            currZoom = e.deltaY < 0 ? Math.min(3, currZoom*1.1) : Math.max(1, currZoom*0.9)
-            e.target.style.zoom = currZoom
-            document.g_currScale = currZoom
-            handleWheelChangeValue(currZoom) // For react Tooltip
+            
+            
+
+            const currZoom = getZoom(e.target)
+            console.log('---------------onWheel: ', currZoom, e.deltaY, e.target)
+            const newZoom = e.deltaY < 0 ? Math.min(3, currZoom*1.05) : Math.max(0.7, currZoom*0.95)
+            var rect = e.target.getBoundingClientRect();
+            const currPos = Utils.getPositionFromStyle(e.target)
+            const offsetPos = Utils.multiplyPosition({x: e.clientX, y: e.clientY}, -newZoom+currZoom);
+            console.log(rect, currPos, offsetPos)
+            Utils.setPositionOfHtmlElement(e.target, {x: currPos.x+offsetPos.x,y:currPos.y+offsetPos.y})
+            // currZoom = e.deltaY < 0 ? Math.min(3, currZoom*1.1) : Math.max(1, currZoom*0.9)
+            e.target.style.zoom = newZoom
+            document.g_currScale = newZoom
+            handleWheelChangeValue(newZoom) // For react Tooltip
         }
     }
     const handleWheelChangeValue = (value) => {

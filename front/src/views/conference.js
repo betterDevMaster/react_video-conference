@@ -3,6 +3,7 @@ import { useSelector, useDispatch} from 'react-redux';
 // import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import * as qs from 'query-string'
 
+import panAndZoomHoc from '../lib/panAndZoomHoc';
 import DraggableContainer from '../components/draggable/draggableContainer';
 import Navbar from '../components/navbar';
 import WebRTC from '../webrtc';
@@ -42,6 +43,7 @@ const Conference = React.memo(props => {
         <Navbar onSetUserClose={handleSetUserClose} videoObj={videoObj} imageObj={imageObj} query={query} /> 
         <div id='foreground_div' style={{position: 'relative', overflow: 'hidden', backgroundImage: `url(${img_small})`, width:'100%', height: '100%'}}>
             <DraggableContainer id='background_div' width={3000} height={3000} isZoom={true} background={img_big}
+            // <DraggableContainer id='background_div' width={3200} height={1600} isZoom={true} background={img_big}
                 onWheelChange={handleWheelChangeValue}
             >
                 {

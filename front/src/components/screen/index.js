@@ -44,11 +44,14 @@ const Screen = React.memo(props => {
             var scale_val = Math.max(0.3, Math.min(1, 150 / (dist)))
             ele.parentNode.style.transform = `translate(${screenCurrObjPos.x}px, ${screenCurrObjPos.y}px) scale(${scale_val})`
         
-            var vol = dist===0?1:Math.max(0, Math.min(1, Math.pow((100 / dist), 4)))
-            // console.log('user volume----------', scale_val, vol)
+            var vol = dist===0?1:Math.max(0, Math.min(1, Math.pow((100 / dist), 3)))
             if (vol < 0.01) vol = 0
             
-            ele.parentNode.firstElementChild.volume = isFinite(vol) ? vol : 1;
+            // console.log('user volume----------', scale_val, vol, ele.firstElementChild)
+            if (ele.firstElementChild)
+                ele.firstElementChild.volume = isFinite(vol) ? vol : 1;
+            // else 
+
             // console.log('user volume----------', vol, ele.firstElementChild) 
         }
     }
