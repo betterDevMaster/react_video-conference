@@ -14,6 +14,15 @@ export default class Utils{
             return {x:0, y:0}
         }
     }
+    static getPositionFromTransformWithScale(ele){
+        try{
+            var posArr = ele.style.transform.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
+            return {x: posArr[0], y: posArr[1], scale: posArr[2]}    
+        } catch(e){
+            console.error(e);
+            return {x:0, y:0}
+        }
+    }
     static getPositionFromStyle(ele){
         try{
             return {x: ele.offsetLeft, y: ele.offsetTop}

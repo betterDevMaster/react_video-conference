@@ -178,7 +178,7 @@ const YoutubeUpload = React.memo(props => {
             muted:0
         }
     };
-    console.log(props.video)
+
     return (
         <Rnd
             noderef={nodeRef}

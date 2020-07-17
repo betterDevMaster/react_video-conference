@@ -46,19 +46,16 @@ function VideoDialog(props){
 
         const videoId = getId(video.value);
 
-        // const back_left = document.getElementById('background_div').style.left.match(/\d+(?:\.\d+)?/g).map(Number);
-        // const back_top = document.getElementById('background_div').style.top.match(/\d+(?:\.\d+)?/g).map(Number);
-
         const videoWidth = 250
         const videoHeight = 140
-        const center_x = Utils.width() / 2 - videoWidth/2
-        const center_y = Utils.height() / 2 - videoHeight/2
-        // const calc_def_x = back_left[0] + document.getElementById('foreground_div').offsetWidth/2 - 382/2
-        // const calc_def_y = back_top[0] + document.getElementById('foreground_div').offsetHeight/2 - 214/2 - 22
+        
+        const draggableBack = document.getElementsByClassName('react-transform-element')[0]
+        const posMe = Utils.getPositionFromTransformWithScale(draggableBack);
+        const calc_def_x = (Math.abs(-posMe.x) + Utils.width() / 2 - videoWidth / 2 * posMe.scale) / posMe.scale
+        const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2 - videoHeight / 2 * posMe.scale) / posMe.scale
 
-        // console.log('videoDlg----------', calc_def_x, calc_def_y)
-        dispatch({type: 'youtube_add', value:{name: videoId, id: 'me', transform: `translate(${center_x}px, ${center_y}px)`, username: props.uname, value: videoId, width: videoWidth, height: videoHeight, defX: center_x, defY: center_y}})
-        WebRTC.getInstance().youtubeAdd({videoId: videoId, name: videoId, transform: `translate(${center_x}px, ${center_y}px)`, username: props.uname, width: videoWidth, height: videoHeight, defX: center_x, defY: center_y})
+        dispatch({type: 'youtube_add', value:{name: videoId, id: 'me', transform: `translate(${calc_def_x}px, ${calc_def_y}px)`, username: props.uname, value: videoId, width: videoWidth, height: videoHeight, defX: calc_def_x, defY: calc_def_y}})
+        WebRTC.getInstance().youtubeAdd({videoId: videoId, name: videoId, transform: `translate(${calc_def_x}px, ${calc_def_y}px)`, username: props.uname, width: videoWidth, height: videoHeight, defX: calc_def_x, defY: calc_def_y})
 
         video.value = ''
         window.$('#videodialog').plainModal('close')

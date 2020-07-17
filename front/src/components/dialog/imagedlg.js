@@ -18,19 +18,16 @@ function ImageDialog(props){
         setImagePreviewUrl(null)
     }
     const handleSubmit = (event) => {
-        // const back_left = document.getElementById('background_div').style.left.match(/\d+(?:\.\d+)?/g).map(Number);
-        // const back_top = document.getElementById('background_div').style.top.match(/\d+(?:\.\d+)?/g).map(Number);
-
-        // var calc_def_x = back_left[0] + document.getElementById('foreground_div').offsetWidth/2 - 275/2
-        // var calc_def_y = back_top[0] + document.getElementById('foreground_div').offsetHeight/2 - 183/2 - 22
-        
         const imageWidth = 230
         const imageHeight = 130
-        const center_x = Utils.width() / 2 - imageWidth/2
-        const center_y = Utils.height() / 2 - imageHeight/2
+        
+        const draggableBack = document.getElementsByClassName('react-transform-element')[0]
+        const posMe = Utils.getPositionFromTransformWithScale(draggableBack);
+        const calc_def_x = (Math.abs(-posMe.x) + Utils.width() / 2 - imageWidth / 2 * posMe.scale) / posMe.scale
+        const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2 - imageHeight / 2 * posMe.scale) / posMe.scale
 
-        dispatch({type: 'image_add', value:{name: fileName, id: 'me', username: props.uname, value: imagePreviewUrl, transform: `translate(${center_x}px, ${center_y}px)`, width: imageWidth, height: imageHeight, defX: center_x, defY: center_y}})
-        WebRTC.getInstance().imageAdd({imageId: imagePreviewUrl, name: fileName, username: props.uname, transform: `translate(${center_x}px, ${center_y}px)`, width: imageWidth, height: imageHeight, defX: center_x, defY: center_y})
+        dispatch({type: 'image_add', value:{name: fileName, id: 'me', username: props.uname, value: imagePreviewUrl, transform: `translate(${calc_def_x}px, ${calc_def_y}px)`, width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y}})
+        WebRTC.getInstance().imageAdd({imageId: imagePreviewUrl, name: fileName, username: props.uname, transform: `translate(${calc_def_x}px, ${calc_def_y}px)`, width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y})
 
         setImagePreviewUrl(null)
         window.$('#imagedialog').plainModal('close')

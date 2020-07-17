@@ -2,7 +2,6 @@ import React, { Component, useState, useEffect } from "react";
 import { useSelector, useDispatch} from 'react-redux';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import * as qs from 'query-string'
-import styled from "styled-components";
 
 import Navbar from '../components/navbar';
 import WebRTC from '../webrtc';
@@ -27,7 +26,6 @@ function Conference(props) {
     const videoObj = useSelector(state=>state.screens.videos);
     const imageObj = useSelector(state=>state.screens.images);
     const bgMoving = useSelector(state=>state.screens.bgMoving);
-    console.log('-----------', users)
     const [userClose, setUserClose] = useState(false);
     const [wheelScale, setWheelScale] = useState(1);
     
@@ -35,7 +33,6 @@ function Conference(props) {
         setUserClose(value)
     }
     const handleWheel = (e) => {
-        console.log(e, e.scale)
         setWheelScale(e.scale)
     }
     
@@ -51,6 +48,7 @@ function Conference(props) {
                     wheel={{ step: 200 }}
                     pan={{ paddingSize: 0, padding: true}}
                     onWheel={(e)=>{handleWheel(e)}}
+                    doubleClick={{ disabled: true}}
                 >
                     <TransformComponent>
                         <div id={'background_div'} style={{backgroundImage: `url(${img_big})`, height: '100vh', width: '100vw'}}>

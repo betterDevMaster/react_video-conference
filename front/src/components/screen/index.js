@@ -148,7 +148,6 @@ const Screen = React.memo(props => {
         validVolumeAndScaleForNeighborhood()
     }, [props.curScale])
 
-    console.log(props.user)
     return (
         <>
             <Rnd
