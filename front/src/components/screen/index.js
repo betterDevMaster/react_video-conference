@@ -45,6 +45,9 @@ const Screen = React.memo(props => {
         const dist = Math.max(1, Math.sqrt((screenMePos.x - screenCurrObjPos.x) * (screenMePos.x - screenCurrObjPos.x) +
             (screenMePos.y - screenCurrObjPos.y) * (screenMePos.y - screenCurrObjPos.y)))
         const scale_val = Math.max(0.3, Math.min(1, 150 / (dist)))
+
+        console.log('-----------------', videoEle, videoEle.parentElement.parentElement)
+        if (videoEle.parentElement.parentElement.className === 'App') return
         videoEle.parentElement.parentElement.style.transform = `translate(${screenCurrObjPos.x}px, ${screenCurrObjPos.y}px) scale(${scale_val})`
 
         var vol = dist === 0 ? 1 : Math.max(0, Math.min(1, Math.pow((100 / dist), 3)))
@@ -52,59 +55,7 @@ const Screen = React.memo(props => {
 
         videoEle.volume = isFinite(vol) ? vol : 1;
     }
-    const setScaleByPosition = () => {
-        const ele = document.getElementById('screen_' + props.user.id)
-        const eleBack = document.getElementById('background_div');
-        const eleFore = document.getElementById('foreground_div');
-
-        if (ele && !window.dragStart) {
-            const posMe = Utils.getPositionFromTransform(ele.parentNode);
-            const posBack = Utils.getPositionFromStyle(eleBack);
-            const videoScreen = document.getElementById(props.user.stream.id);
-            const eleSmall = document.getElementById(smallScreenId)
-
-            console.log('curScale---------------curScale: ', props.curScale)
-            document.g_currScale = 1
-            const viewRect = {
-                left: -posBack.x,
-                top: -posBack.y,
-                right: -posBack.x + eleFore.clientWidth / document.g_currScale,
-                bottom: -posBack.y + eleFore.clientHeight / document.g_currScale
-            }
-            var inRect = Utils.isInRect(viewRect, posMe)
-            console.log(inRect, viewRect, posMe)
-            if (!inRect) {
-                if (eleSmall.childNodes.length === 0) {
-                    eleSmall.appendChild(videoScreen);
-
-                    eleSmall.style.display = 'inline-block'
-                    ele.parentNode.style.display = 'none';
-                }
-                const smallPos = getDistanceByRectAndPosition(
-                    Utils.multiplyPosition(Utils.addPosition(posMe, posBack), document.g_currScale),
-                    eleFore.clientWidth,
-                    eleFore.clientHeight
-                )
-                Utils.setPositionOfHtmlElement(eleSmall, smallPos);
-
-            } else {
-                eleSmall.style.display = 'none'
-                ele.parentNode.style.display = 'inline-block';
-
-                const d = document.getElementById(screenid)
-                d.appendChild(videoScreen)
-            }
-        }
-    }
-
-    const getDistanceByRectAndPosition = (pos, width, height) => {
-        if (pos.y < 0) pos.y = 25
-        if (pos.y > height) pos.y = height - 25
-        if (pos.x < 0) pos.x = 25
-        if (pos.x > width) pos.x = width - 25
-
-        return { x: pos.x - 50, y: pos.y - 50 }
-    }
+    
     const handleDragStart = (e, detail) => {
         window.dragStart = true
 

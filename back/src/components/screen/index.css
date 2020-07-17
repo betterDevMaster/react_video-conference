@@ -4,6 +4,12 @@
     display: inline-block;
     outline-style: none;
 }
+.screen_small {
+    object-fit: cover;
+    position: absolute;
+    display: inline-block;
+    outline-style: none;
+}
 .video {
     object-fit: cover;
     position: absolute;
