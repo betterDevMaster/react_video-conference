@@ -1,32 +1,48 @@
 {
-  "name": "video-meeting-backend",
-  "version": "0.0.1",
-  "description": "server for react email confirm",
-  "main": "server.js",
-  "scripts": {
-    "lint": "eslint --ext .js -c .eslintrc .",
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "jesse heaslip",
-  "license": "MIT",
+  "name": "video-meeting-front",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^6.2.0",
-    "express": "^4.16.4",
-    "forever": "^0.15.3",
-    "handlebars": "*",
-    "mongoose": "^5.4.1",
-    "mysql": "^2.18.1",
-    "nodemailer": "^5.0.0",
-    "open-easyrtc": "*",
-    "socket.io": "*"
+    "@fortawesome/fontawesome-svg-core": "^1.2.12",
+    "@fortawesome/free-brands-svg-icons": "^5.6.3",
+    "@fortawesome/free-regular-svg-icons": "^5.6.3",
+    "@fortawesome/free-solid-svg-icons": "^5.6.3",
+    "@fortawesome/react-fontawesome": "^0.1.3",
+    "is-image-url": "^1.1.8",
+    "node-sass": "^4.14.1",
+    "query-string": "^6.12.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-fontawesome": "^1.6.1",
+    "react-recaptcha": "^2.3.10",
+    "react-redux": "^7.2.0",
+    "react-rnd": "^10.1.10",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.4.1",
+    "react-spinkit": "^3.0.0",
+    "react-youtube": "^7.11.2",
+    "react-zoom-pan-pinch": "^1.6.1",
+    "redux": "^4.0.5"
   },
-  "devDependencies": {
-    "nodemon": "^1.18.9",
-    "now": "^13.0.0"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "engines": {
-    "node": "5.x"
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

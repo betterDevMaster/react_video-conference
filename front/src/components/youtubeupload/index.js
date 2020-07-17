@@ -121,19 +121,15 @@ const YoutubeUpload = React.memo(props => {
         }
     }
     function calculateEdge(posX, posY, vdoWidth, vdoHeight) {
-        const width = document.getElementById('background_div').offsetWidth
-        const height = document.getElementById('background_div').offsetHeight
-
-        if (posX >= width - vdoWidth - 10)
-            posX = width - vdoWidth - 10
+        if (posX >= Utils.width() - vdoWidth - 10)
+            posX = Utils.width() - vdoWidth - 10
         if (posX < 10)
             posX = 10
-        if (posY >= height - vdoHeight - 60)
-            posY = height - vdoHeight - 60
+        if (posY >= Utils.height() - vdoHeight - 10)
+            posY = Utils.height() - vdoHeight - 10
         if (posY < 30) // 22 is close header height
             posY = 30
 
-        // console.log('----------', posX, posY, width, height)
         return {x: posX, y: posY}
     }
     if (props.video.id != 'me' && videoRef.current) {
@@ -148,12 +144,10 @@ const YoutubeUpload = React.memo(props => {
             videoRef.current.internalPlayer.pauseVideo()
         }
     }
-
+    if (nodeRef.current && !props.video.transform && props.video.defX) {
+        nodeRef.current.parentNode.style.transform = `translate(${props.video.defX}px, ${props.video.defY}px)`
+    }
     if (nodeRef.current && props.video.transform) {
-        // console.log('other youtube transform: ', props.video.transform, props.video.width, props.video.height)
-
-        // console.log('----------first: ', props.video)
-
         nodeRef.current.parentNode.style.width = props.video.width + 'px';
         nodeRef.current.parentNode.style.height = props.video.height + 'px';
 
@@ -161,16 +155,12 @@ const YoutubeUpload = React.memo(props => {
         var numbers = string.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
         var { x, y } = calculateEdge(numbers[0], numbers[1], props.video.width, props.video.height)
         nodeRef.current.parentNode.style.transform = `translate(${x}px, ${y}px)`
-    }
 
-    if (nodeRef.current && !props.video.transform && props.video.defX) {
-        // console.log('---------- second:', props.video)
-     
-        nodeRef.current.parentNode.style.transform = `translate(${props.video.defX}px, ${props.video.defY}px)`
+        props.video.defX = x
+        props.video.defY = y
     }
 
     console.log(props.video)
-
     const opts = {
         origin: 'https://webrtc.bcisummit.com',
         playerVars: {
@@ -230,7 +220,6 @@ const YoutubeUpload = React.memo(props => {
                         onClick={(e)=>toggleChange(e)} alt="youtubeAudio"></img>
                 }
             </div>
-        {/* </Draggable> */}
         </Rnd>
     );
 })

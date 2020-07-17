@@ -1,16 +1,17 @@
 .app-header[data-v-2db9ff64] {
 	display: flex;
-	flex-direction: row;
-	align-items: center;
-	background-color: #212121;
-	z-index: 50;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	height: 50px;
-	min-height: 50px;
-	padding: 0 80px;
+    flex-direction: column;
+    align-items: center;
+    z-index: 250;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    height: 50px;
+    min-height: 50px;
+	left: 30%;
+	top: 3%;
+    position: fixed;
 }
 
 @media (max-width:767px) {
@@ -209,7 +210,7 @@
 
 .header .title[data-v-a995c326] {
 	flex-grow: 1;
-	opacity: .5;
+	/* opacity: .5; */
 	font-size: 12px;
 	font-weight: 500;
 	line-height: 1.83;

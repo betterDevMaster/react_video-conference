@@ -5,6 +5,7 @@ import { Rnd } from "react-rnd";
 import './index.css';
 import closeimage from '../../images/closevideo.svg'
 import WebRTC from '../../webrtc';
+import Utils from '../../utils/position';
 
 const ImageUpload = React.memo((props) => {
     const nodeRef = React.useRef(null);
@@ -23,30 +24,28 @@ const ImageUpload = React.memo((props) => {
         WebRTC.getInstance().imagePosition({transform: nodeRef.current.parentNode.style.transform, name: props.image.name, width: width, height: height, defX: x, defY: y})
         dispatch({type: 'image_position', value: { transform: nodeRef.current.parentNode.style.transform, name: props.image.name, width: width, height: height, defX: x, defY: y } })
     }
-    function calculateEdge(posX, posY, vdoWidth, vdoHeight) {
-        const width = document.getElementById('background_div').offsetWidth
-        const height = document.getElementById('background_div').offsetHeight
-
-        if (posX >= width - vdoWidth - 10)
-            posX = width - vdoWidth - 10
+    function calculateEdge(posX, posY, imgWidth, imgHeight) {
+        if (posX >= Utils.width() - imgWidth - 10)
+            posX = Utils.width() - imgWidth - 10
         if (posX < 10)
             posX = 10
-        if (posY >= height - vdoHeight - 60)
-            posY = height - vdoHeight - 60
+        if (posY >= Utils.height() - imgHeight - 10)
+            posY = Utils.height() - imgHeight - 10
         if (posY < 30) // 22 is close header height
             posY = 30
 
         return {x: posX, y: posY}
     }
-    
     if (nodeRef.current && props.image.transform) {
         nodeRef.current.parentNode.style.width = props.image.width + 'px';
         nodeRef.current.parentNode.style.height = props.image.height + 'px';
         
         var string = props.image.transform 
         var numbers = string.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)
-        var { x, y } = calculateEdge(numbers[0], numbers[1], props.image.videoWidth, props.image.videoHeight)
+        var { x, y } = calculateEdge(numbers[0], numbers[1], props.image.width, props.image.height)
         nodeRef.current.parentNode.style.transform = `translate(${x}px, ${y}px)`
+        props.image.defX = x
+        props.image.defY = y
     }
 
     if (nodeRef.current && !props.image.transform && props.image.defX) {

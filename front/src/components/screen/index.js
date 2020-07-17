@@ -130,17 +130,21 @@ const Screen = React.memo(props => {
         WebRTC.getInstance().updateMyPosition()
     }
     function calculateEdge(posX, posY) {
-        const ele = document.getElementById('foreground_div')
-        const back = document.getElementById('background_div')
-        const width = ele.clientWidth
-        const height = ele.clientHeight
-        const pos = Utils.addPosition({ x: posX, y: posY }, Utils.getPositionFromStyle(back))
+        if (posX >= Utils.width() - 80 - 10)
+            posX = Utils.width() - 80 - 10
+        if (posX < 10)
+            posX = 10
+        if (posY >= Utils.height() - 80 - 10)
+            posY = Utils.height() - 80 - 10
+        if (posY < 30) // 22 is close header height
+            posY = 30
 
-        return { x: posX, y: Math.max(50, Math.min(height, pos.y)) }
+        return {x: posX, y: posY}
     }
 
     if (nodeRef.current && props.user.id != 'me') {
-        nodeRef.current.parentNode.style.transform = `translate(${props.user.defPosX}px, ${props.user.defPosY}px)`
+        var { x, y } = calculateEdge(props.user.defPosX, props.user.defPosY, 80, 80)
+        nodeRef.current.parentNode.style.transform = `translate(${x}px, ${y}px)`
         validVolumeAndScaleForNeighborhood()
     }
 
@@ -160,7 +164,7 @@ const Screen = React.memo(props => {
                     handleDragStop(e, d)
                 }}
                 scale={props.curScale}
-                style={{ zIndex: props.user.id === 'me' ? 50 : 25, transform: 'translate(693px, 375px) scale(0.8)' }}
+                style={{ zIndex: props.user.id === 'me' ? 50 : 25 }}
                 lockAspectRatio={true}
                 enableResizing={false}
                 disableDragging={props.user.id != 'me' ? true : false}

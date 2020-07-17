@@ -1,0 +1,38 @@
+.screen {
+    object-fit: cover;
+    position: absolute;
+    display: inline-block;
+    outline-style: none;
+}
+.video {
+    object-fit: cover;
+    position: absolute;
+    border-radius: 50%;
+    transform-origin: 50% 50%;
+    width: 100%;
+    height: 100%;
+}
+.videoStatus {
+    position: relative;
+    height: 25px;
+    background-color: rgba(0, 0, 0, 0.596);
+    text-align: left;
+    color: white;
+    font-size: small;
+    z-index: 1000;
+    margin-left:5px;
+    margin-right: 5px;
+}
+.speaker {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    top: 0px;
+    padding-top: 25%;
+    align-content: right;
+    opacity: 0;
+}
+.speaker:hover {
+    opacity: 1;
+}

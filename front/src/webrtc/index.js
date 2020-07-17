@@ -520,7 +520,6 @@ class WebRTC {
 
                     WebRTC.getInstance().updateMyPosition(position)
                 }, function(errorCode, errorText){
-                    // WebRTC.getInstance().updateMyPosition({x:0, y:0})
                 }
             );
                
