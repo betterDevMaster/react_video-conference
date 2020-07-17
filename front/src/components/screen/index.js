@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
-import ReactTooltip from "react-tooltip";
 import { Rnd } from "react-rnd";
 
 import WebRTC from '../../webrtc';
@@ -20,6 +19,7 @@ const Screen = React.memo(props => {
     const [firstPosX, setFirstPosX] = useState(0)
     const [firstPosY, setFirstPosY] = useState(0)
 
+    console.log(props.user)
     var ele_Screen = document.getElementById('screen_' + props.user.id)
 
     useEffect(() => {
@@ -111,9 +111,7 @@ const Screen = React.memo(props => {
         if(props.user.id !== 'me')
             setVolumeForNeighborhood();
             
-        // console.log('ele_Screen-------------', ele_Screen)
-        // if (ele_Screen)
-        setScaleByPosition()
+        // setScaleByPosition()
         setTimeout(onTimer, 50)
     }
 
