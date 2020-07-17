@@ -3,6 +3,8 @@ import ReactSpinner from 'react-spinkit'
 // import {Redirect} from 'react-router-dom';
 import * as qs from 'query-string'
 
+import WebRTC from '../webrtc';
+import Utils from '../utils/position'
 import logosvg from '../images/logo.svg'
 import logosmallsvg from '../images/logo-small.svg'
 import joinbtn from '../images/joinbtn.svg'
@@ -35,7 +37,7 @@ function Room(props) {
         window.localStorage.setItem('r', query.space)
         window.localStorage.setItem('r', 'tryme')
         window.localStorage.setItem('userName', userName)
-        
+
         setTimeout(()=>{
             props.history.push('/conference?space='+query.space+'&uname='+userName);
             // props.history.push('/home/conference');
@@ -43,6 +45,7 @@ function Room(props) {
             // this.context.router.push('child')
         }, 2500);
     }
+    
     return (
     <div data-v-12a888fb="" className="space">
         <div data-v-2db9ff64="" className="app-header" data-v-12a888fb="">

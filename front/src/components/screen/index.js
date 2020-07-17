@@ -24,7 +24,6 @@ const Screen = React.memo(props => {
 
     useEffect(() => {
         var video = document.getElementById(props.user.stream.id);
-
         if(video){
             window.easyrtc.setVideoObjectSrc(video, props.user.stream);
             setTimeout(onTimer, 100);
@@ -157,7 +156,7 @@ const Screen = React.memo(props => {
                 enableResizing={false}
                 disableDragging={props.user.id != 'me' ? true : false}
             >
-                <div ref={nodeRef} id={screenid} data-tip data-for={props.user.id} key={props.user.id} className='screen'
+                <div ref={nodeRef} id={screenid} key={props.user.id} className='screen'
                     style={{width: 100, height: 100, borderRadius: '50%', marginLeft:-50, marginTop:-50,
                                 border: props.user.id === 'me'?'2px solid #dcdb53':'2px solid' }} 
                     tabIndex={0}  >
@@ -166,7 +165,7 @@ const Screen = React.memo(props => {
                         id={props.user.stream.id} 
                         controls="" loop="" muted={'me' === props.user.id} 
                         onMouseMove={
-                            (e)=>{
+                            (e)=>{  
                                 const ele = document.getElementById('div_tip')
                                 ele.style.left = e.screenX + 'px'
                                 ele.style.top = (e.screenY-150) + 'px'

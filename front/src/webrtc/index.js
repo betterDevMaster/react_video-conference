@@ -1,3 +1,5 @@
+import Utils from '../utils/position'
+
 class WebRTC {
     static _instance = null;
     client = null;
@@ -10,12 +12,7 @@ class WebRTC {
     enableScreenShare = true
     enableCamera = true
     enableMic = true
-    // visibleScreenWidth = document.getElementsByClassName('space')[0].offsetWidth
-    // visibleScreenHeight = document.getElementsByClassName('space')[0].offsetHeight
-    visibleScreenWidth = document.getElementById('background_div').offsetWidth
-    visibleScreenHeight = document.getElementById('background_div').offsetHeight
-    // visibleScreenWidth = 0
-    // visibleScreenHeight = 0
+
     videoQualities = [
         {text:'SSM (30p - 128Kb/s)', value:{width: 160, height:120, frameRate: 10}},
         {text:'SM (120p - 256Kb/s)', value:{width: 320, height:240, frameRate: 10}},
@@ -507,9 +504,8 @@ class WebRTC {
         .connect(userName, this.roomName, (client) => {
             console.log('start local stream: ', userName, 'roomName = ',this.roomName)
             var stream = client.getLocalStream();
-            console.log('-------------------',  WebRTC.getInstance().visibleScreenWidth,  WebRTC.getInstance().visibleScreenHeight)
 
-            window.easyrtc.sendServerMessage('get_my_position', {clientId: client.getId(), sWidth: WebRTC.getInstance().visibleScreenWidth, sHeight: WebRTC.getInstance().visibleScreenHeight},
+            window.easyrtc.sendServerMessage('get_my_position', {clientId: client.getId(), sWidth: Utils.width(), sHeight: Utils.height()},
             // window.easyrtc.sendServerMessage('get_my_position', {clientId: client.getId()},
                 function(msgType, position){
                     // console.log('webrtc---------- ', position)

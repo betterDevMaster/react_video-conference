@@ -28,53 +28,59 @@ function Conference(props) {
     const imageObj = useSelector(state=>state.screens.images);
 
     const [userClose, setUserClose] = useState(false);
-    const [wheelChange, setWheelChange] = useState(1);
+    const [wheelScale, setWheelScale] = useState(1);
     
     const handleSetUserClose = (value) => {
         setUserClose(value)
     }
-    const handleWheelChangeValue = (value) => {
-        setWheelChange(value)
-    }
-
+    // const handleWheelChangeValue = (value) => {
+    //     setWheelChange(value)
+    // }
     const handleWheel = (e) => {
-        console.log(e)
+        console.log(e, e.scale)
+        setWheelScale(e.scale)
     }
     const Container = styled.div`
         height: 100vh;
         width: 100vw;
         background-image: url(${img_big});
     `;
-    console.log('container----------', Container)
+
+    // const defScale = window.localStorage.getItem('windowScale')
+    // const defPosX = parseInt(window.localStorage.getItem('windowScreenWidth') / 2)
+    // const defPosY = parseInt(window.localStorage.getItem('windowScreenHeight') / 2)
+    // console.log('----------------', defScale, defPosX, defPosY)
+    
     return (
-    // <div data-v-12a888fb="" className="space">
-    <React.Fragment>
-        <div id='foreground_div' style={{backgroundImage: `url(${img_small})`}}>
-            <Navbar onSetUserClose={handleSetUserClose} videoObj={videoObj} imageObj={imageObj} query={query} /> 
-            <TransformWrapper
-                defaultScale={ 2 }
-                defaultPositionX={1260}
-                defaultPositionY={960}
-                options={{ minScale: 1, maxScale: 4}}
-                wheel={{ step: 100 }}
-            >
-                <TransformComponent>
-                    <Container id={'background_div'} >
-                        {
-                            users.map((user) => <Screen key={user.id} curScale={wheelChange} user={user} />)
-                        }
-                        {
-                            videoObj.map((video) => <YoutubeUpload key={video.name} video={video} cur={wheelChange} userClose={userClose} room={query.space} />)
-                        }
-                        {
-                            imageObj.map((image) => <ImageUpload key={image.value} image={image} cur={wheelChange} userClose={userClose} room={query.space} />)
-                        }
-                    </Container>                    
-                </TransformComponent>
-            </TransformWrapper>
-        </div>
-        <Tip />
-    </React.Fragment>
+        <React.Fragment>
+            <div id='foreground_div' style={{backgroundImage: `url(${img_small})`}}>
+                <Navbar onSetUserClose={handleSetUserClose} videoObj={videoObj} imageObj={imageObj} query={query} /> 
+                <TransformWrapper
+                    enablePadding={false}
+                    enablePanPadding={false}
+                    scalePadding={{ disabled: true}}
+                    options={{ minScale: 1, maxScale: 4}}
+                    wheel={{ step: 200 }}
+                    pan={{ paddingSize: 0, padding: true}}
+                    onWheel={handleWheel}
+                >
+                    <TransformComponent>
+                        <Container id={'background_div'} >
+                            {
+                                users.map((user) => <Screen key={user.id} curScale={wheelScale} user={user} />)
+                            }
+                            {
+                                videoObj.map((video) => <YoutubeUpload key={video.name} video={video} curScale={wheelScale} userClose={userClose} room={query.space} />)
+                            }
+                            {
+                                imageObj.map((image) => <ImageUpload key={image.value} image={image} curScale={wheelScale} userClose={userClose} room={query.space} />)
+                            }
+                        </Container>                    
+                    </TransformComponent>
+                </TransformWrapper>
+            </div>
+            <Tip />
+        </React.Fragment>
     );
 }
 

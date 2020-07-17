@@ -42,4 +42,14 @@ export default class Utils{
             return false;
         }
     }
+    static width(){
+        return(window.innerWidth)?
+        window.innerWidth:
+        document.documentElement.clientWidth||document.body.clientWidth||0;
+    }
+    static height(){
+        return(window.innerHeight)?
+        window.innerHeight:
+        document.documentElement.clientHeight||document.body.clientHeight||0;
+    }
 }
