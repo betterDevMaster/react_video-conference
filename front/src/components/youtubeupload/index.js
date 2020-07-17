@@ -76,7 +76,12 @@ const YoutubeUpload = React.memo(props => {
         dispatch({type: 'youtube_remove', name: value})
         WebRTC.getInstance().youtubeRemove({name: value})
     }
-    const handleStop = (x, y, width, height) => {
+    const handleDragStart = (e, detail) => {
+        dispatch({type: 'backgound_moving', value: true })
+    }
+    const handleDragStop = (x, y, width, height) => {
+        dispatch({type: 'backgound_moving', value: false })
+
         WebRTC.getInstance().youtubePosition({transform: nodeRef.current.parentNode.style.transform, name: props.video.name, width: width, height: height, defX: x, defY: y})
         dispatch({type: 'youtube_position', value: { transform: nodeRef.current.parentNode.style.transform, name: props.video.name, width: width, height: height, defX: x, defY: y } })
     }
@@ -173,12 +178,13 @@ const YoutubeUpload = React.memo(props => {
             muted:0
         }
     };
+    console.log(props.video)
     return (
         <Rnd
             noderef={nodeRef}
             size={{ width: props.video.width,  height: props.video.height }}
             position={{ x: props.video.defX, y: props.video.defY }}
-            scale={props.cur}   
+            scale={props.curScale}   
             lockAspectRatio={true}
             style = {{zIndex: props.video.id==='me'?10:5}}
             disableDragging={props.video.id==='me' ? false: true}
@@ -187,14 +193,15 @@ const YoutubeUpload = React.memo(props => {
                 bottomRight:props.video.id==='me' ? true : false, 
                 bottomLeft:props.video.id==='me' ? true : false, 
                 topLeft:props.video.id==='me' ? true : false }}
+            onDragStart={(e, d) => {handleDragStart(e, d)}}
             onDragStop={(e, d) => { 
                 const posArr = calculateEdge(d.x, d.y, props.video.width, props.video.height)
-                handleStop(posArr.x, posArr.y, props.video.width, props.video.height)
+                handleDragStop(posArr.x, posArr.y, props.video.width, props.video.height)
             }}
             onResizeStop={(e, direction, refval, delta, position) => {
                 var resizeWidth = parseInt(refval.style.width.match(/\d+/)[0]) // after resizing, remove 'px' string
                 var resizeHeight = parseInt(refval.style.height.match(/\d+/)[0]) // after resizing, remove 'px' string
-                handleStop(props.video.defX, props.video.defY, resizeWidth, resizeHeight)
+                handleDragStop(props.video.defX, props.video.defY, resizeWidth, resizeHeight)
             }}
         >
             <div data-v-c1f79ed4="" data-v-6e496afa="" data-v-7e3fe256="" ref={nodeRef} key={props.video.id} id={videoid}

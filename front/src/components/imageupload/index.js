@@ -14,10 +14,14 @@ const ImageUpload = React.memo((props) => {
         dispatch({type: 'image_remove', name: value})
         WebRTC.getInstance().imageRemove({name: value})
     }
-    const handleStop = (x, y, width, height) => {
+    const handleDragStart = (e, detail) => {
+        dispatch({type: 'backgound_moving', value: true })
+    }
+    const handleDragStop = (x, y, width, height) => {
+        dispatch({type: 'backgound_moving', value: false })
+
         WebRTC.getInstance().imagePosition({transform: nodeRef.current.parentNode.style.transform, name: props.image.name, width: width, height: height, defX: x, defY: y})
         dispatch({type: 'image_position', value: { transform: nodeRef.current.parentNode.style.transform, name: props.image.name, width: width, height: height, defX: x, defY: y } })
-
     }
     function calculateEdge(posX, posY, vdoWidth, vdoHeight) {
         const width = document.getElementById('background_div').offsetWidth
@@ -54,7 +58,7 @@ const ImageUpload = React.memo((props) => {
             noderef={nodeRef}
             size={{ width: props.image.width,  height: props.image.height }}
             position={{ x: props.image.defX, y: props.image.defY }}
-            scale={props.cur}   
+            scale={props.curScale}   
             lockAspectRatio={true}
             enableResizing={{ top:false, right:false, bottom:false, left:false, 
                 topRight:props.image.id==='me' ? true : false, 
@@ -63,14 +67,15 @@ const ImageUpload = React.memo((props) => {
                 topLeft:props.image.id==='me' ? true : false }}
             disableDragging={props.image.id==='me' ? false: true}
             style = {{zIndex: props.image.id==='me'?10:5}}
+            onDragStart={(e, d) => {handleDragStart(e, d)}}
             onDragStop={(e, d) => { 
                 const posArr = calculateEdge(d.x, d.y, props.image.width, props.image.height)
-                handleStop(posArr.x, posArr.y, props.image.width, props.image.height)
+                handleDragStop(posArr.x, posArr.y, props.image.width, props.image.height)
             }}
             onResizeStop={(e, direction, refval, delta, position) => {
                 var resizeWidth = parseInt(refval.style.width.match(/\d+/)[0]) // after resizing, remove 'px' string
                 var resizeHeight = parseInt(refval.style.height.match(/\d+/)[0]) // after resizing, remove 'px' string
-                handleStop(props.image.defX, props.image.defY, resizeWidth, resizeHeight)
+                handleDragStop(props.image.defX, props.image.defY, resizeWidth, resizeHeight)
             }}
         >
             <div ref={nodeRef} key={props.image.id} >

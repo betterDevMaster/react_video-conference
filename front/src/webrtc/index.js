@@ -127,9 +127,15 @@ class WebRTC {
     
     youtubePosition (value) {
         this.youtubes.forEach((youtube)=>{
-            if(youtube.name === value.name)
+            if(youtube.name === value.name) {
                 youtube.transform = value.transform;
+                youtube.defX = value.defX;
+                youtube.defY = value.defY;
+                youtube.width = value.width;
+                youtube.height = value.height;
+            }
         })
+        console.log('------------youtubePosition', value, this.youtubes)
         if(this.client)
             this.client.sendPeerMessage({room: this.roomName}, 'youtube-position', value);
     }
@@ -146,9 +152,6 @@ class WebRTC {
             this.client.sendPeerMessage({room: this.roomName}, 'youtube-play', value);
     }
     youtubeAdd (value) {
-        // value.transform = 'translate(0px, 0px)'
-        // value.videoWidth = 382
-        // value.videoHeight = 214
         WebRTC.getInstance().youtubes.push(value)
         if(WebRTC.getInstance().client)
             WebRTC.getInstance().client.sendPeerMessage({room: this.roomName}, 'youtube-add', value);
@@ -168,8 +171,13 @@ class WebRTC {
     }
     imagePosition (value) {
         this.images.forEach((image)=>{
-            if(image.name === value.name)
+            if(image.name === value.name) {
                 image.transform = value.transform
+                image.defX = value.defX;
+                image.defY = value.defY;
+                image.width = value.width;
+                image.height = value.height;
+            }
         })
         if(this.client)
             this.client.sendPeerMessage({room: this.roomName}, 'image-position', value);
@@ -461,11 +469,8 @@ class WebRTC {
                     console.log('onStreamAccept: ', peerName, 'roomName = ', WebRTC.getInstance().roomName)
                     dispatch({type: 'user_add', value: {id: peerId, name: peerName, stream, defPosX: position.x, defPosY: position.y} })
                     WebRTC.getInstance().onStreamConfigurationChange(peerId);
-                    
-                    // WebRTC.getInstance().updatePeerPosition(peerId, peerName, position)
                 }, function(errorCode, errorText){
-                    // WebRTC.getInstance().updatePeerPosition(peerId, {x:0, y:0})
-               });
+            });
             WebRTC.getInstance().youtubes.forEach((youtube)=>{
                 WebRTC.getInstance().client.sendPeerMessage(
                     {rtcId: peerId}, 
@@ -598,30 +603,14 @@ class WebRTC {
         });
     }
     updatePeerPosition(content){
-        // console.log('---------updatePeerPosition------------', content)
         WebRTC.getInstance().dispatch({type: 'user_position', value: {id: content.position.peerId, defPosX: content.position.x, defPosY: content.position.y} })
-
-        // const setPos = ()=>{
-        //     const peer = document.getElementById('screen_'+peerId);
-        //     if(peer){
-        //         peer.style.left = position.x + 'px'
-        //         peer.style.top = position.y + 'px'
-        //     }else{
-        //         setTimeout(setPos, 100)
-        //     }
-        // };
-        // setTimeout(setPos, 100)
     }
     updateMyPosition( position ){
-        // const me = document.getElementById('screen_me');
         if(this.client){
             if(!position)
                 position = this.myPosition;
-            // me.style.left = position.x + 'px';
-            // me.style.top = position.y + 'px';
             this.myPosition = position;
 
-            // console.log('updateMyposition------------------', position, this.client)
             this.client.sendPeerMessage({room: this.roomName}, 'set_peer_position', {id: this.client.getId(), position:this.myPosition});
         }
     }
