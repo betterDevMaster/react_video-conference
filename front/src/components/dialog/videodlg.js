@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux';
 
 import './index.css';
 import WebRTC from '../../webrtc';
+import Utils from '../../utils/position';
+
 import youtube from '../../images/youtube1.svg'
 
 function VideoDialog(props){
@@ -44,14 +46,19 @@ function VideoDialog(props){
 
         const videoId = getId(video.value);
 
-        const back_left = document.getElementById('background_div').style.left.match(/\d+(?:\.\d+)?/g).map(Number);
-        const back_top = document.getElementById('background_div').style.top.match(/\d+(?:\.\d+)?/g).map(Number);
-        const calc_def_x = back_left[0] + document.getElementById('foreground_div').offsetWidth/2 - 382/2
-        const calc_def_y = back_top[0] + document.getElementById('foreground_div').offsetHeight/2 - 214/2 - 22
+        // const back_left = document.getElementById('background_div').style.left.match(/\d+(?:\.\d+)?/g).map(Number);
+        // const back_top = document.getElementById('background_div').style.top.match(/\d+(?:\.\d+)?/g).map(Number);
 
-        console.log('videoDlg----------', calc_def_x, calc_def_y)
-        dispatch({type: 'youtube_add', value:{name: videoId, id: 'me', transform: `translate(${calc_def_x}px, ${calc_def_y}px)`, username: props.uname, value: videoId, width: 382, height: 214, defX: calc_def_x, defY: calc_def_y}})
-        WebRTC.getInstance().youtubeAdd({videoId: videoId, name: videoId, transform: `translate(${calc_def_x}px, ${calc_def_y}px)`, username: props.uname, width: 382, height: 214, defX: calc_def_x, defY: calc_def_y})
+        const videoWidth = 250
+        const videoHeight = 140
+        const center_x = Utils.width() / 2 - videoWidth/2
+        const center_y = Utils.height() / 2 - videoHeight/2
+        // const calc_def_x = back_left[0] + document.getElementById('foreground_div').offsetWidth/2 - 382/2
+        // const calc_def_y = back_top[0] + document.getElementById('foreground_div').offsetHeight/2 - 214/2 - 22
+
+        // console.log('videoDlg----------', calc_def_x, calc_def_y)
+        dispatch({type: 'youtube_add', value:{name: videoId, id: 'me', transform: `translate(${center_x}px, ${center_y}px)`, username: props.uname, value: videoId, width: videoWidth, height: videoHeight, defX: center_x, defY: center_y}})
+        WebRTC.getInstance().youtubeAdd({videoId: videoId, name: videoId, transform: `translate(${center_x}px, ${center_y}px)`, username: props.uname, width: videoWidth, height: videoHeight, defX: center_x, defY: center_y})
 
         video.value = ''
         window.$('#videodialog').plainModal('close')

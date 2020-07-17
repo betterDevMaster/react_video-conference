@@ -13,6 +13,7 @@ const Screen = React.memo(props => {
     const screenid = 'screen_'+props.user.id 
     const smallScreenId = 'smallscreen_'+props.user.id 
     const nodeRef = React.useRef(null);
+    const dispatch = useDispatch()
 
     const [xPos, setXPos] = useState(props.user.defPosX)
     const [yPos, setYPos] = useState(props.user.defPosY)
@@ -24,6 +25,7 @@ const Screen = React.memo(props => {
 
     useEffect(() => {
         var video = document.getElementById(props.user.stream.id);
+
         if(video){
             window.easyrtc.setVideoObjectSrc(video, props.user.stream);
             setTimeout(onTimer, 100);
@@ -46,7 +48,7 @@ const Screen = React.memo(props => {
             var vol = dist===0?1:Math.max(0, Math.min(1, Math.pow((100 / dist), 3)))
             if (vol < 0.01) vol = 0
             
-            // console.log('user volume----------', scale_val, vol, ele.firstElementChild)
+            console.log('user volume----------', scale_val, vol, dist, ele.firstElementChild)
             if (ele.firstElementChild)
                 ele.firstElementChild.volume = isFinite(vol) ? vol : 1;
             // else 
@@ -110,17 +112,20 @@ const Screen = React.memo(props => {
         if(props.user.id !== 'me')
             setVolumeForNeighborhood();
             
-        // setScaleByPosition()
+        setScaleByPosition()
         setTimeout(onTimer, 50)
     }
 
     const handleStart = (ev, detail) => {
         window.dragStart = true
+        dispatch({type: 'backgound_moving', value: true })
         setFirstPosX(detail.x)
         setFirstPosY(detail.y)
     }
     const handleStop = (e, detail) => {
         window.dragStart = false
+
+        dispatch({type: 'backgound_moving', value: false })
         WebRTC.getInstance().myPosition.x += (detail.x - firstPosX)
         WebRTC.getInstance().myPosition.y += (detail.y - firstPosY)
         WebRTC.getInstance().updateMyPosition()
@@ -156,8 +161,8 @@ const Screen = React.memo(props => {
                 enableResizing={false}
                 disableDragging={props.user.id != 'me' ? true : false}
             >
-                <div ref={nodeRef} id={screenid} key={props.user.id} className='screen'
-                    style={{width: 100, height: 100, borderRadius: '50%', marginLeft:-50, marginTop:-50,
+                <div ref={nodeRef} id={screenid} data-tip data-for={props.user.id} key={props.user.id} className='screen'
+                    style={{width: 80, height: 80, borderRadius: '50%', marginLeft:-40, marginTop:-40,
                                 border: props.user.id === 'me'?'2px solid #dcdb53':'2px solid' }} 
                     tabIndex={0}  >
                     <video 
@@ -165,7 +170,7 @@ const Screen = React.memo(props => {
                         id={props.user.stream.id} 
                         controls="" loop="" muted={'me' === props.user.id} 
                         onMouseMove={
-                            (e)=>{  
+                            (e)=>{
                                 const ele = document.getElementById('div_tip')
                                 ele.style.left = e.screenX + 'px'
                                 ele.style.top = (e.screenY-150) + 'px'

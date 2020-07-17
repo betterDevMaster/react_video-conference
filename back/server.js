@@ -132,18 +132,18 @@ const calcualteMyPosition = (peerId, width, height, socketId)=>{
   // center.x /= peerPositions.length
   // center.y /= peerPositions.length
   const ang = Math.random() * 2 * Math.PI
-  var posX = Math.floor(center.x + Math.cos(ang)* 150)
-  var posY = Math.floor(center.y + Math.sin(ang)* 150)
+  var posX = Math.floor(center.x + Math.cos(ang)* 100)
+  var posY = Math.floor(center.y + Math.sin(ang)* 100)
 
 
-  if (posX >= width - 120)
-    posX = width - 120
-  else if (posX <= 120)
-    posX = 120
-  if (posY >= height - 150)
-    posY = height - 150
-  else if (posY <= 150)
-    posY = 150
+  if (posX >= width - 80)
+    posX = width - 80
+  else if (posX <= 80)
+    posX = 80
+  if (posY >= height - 100)
+    posY = height - 100
+  else if (posY <= 100)
+    posY = 100
 
   const retPos = {
                   x: posX,

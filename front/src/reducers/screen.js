@@ -1,10 +1,10 @@
 const screens = (state = {bgMoving:false, videos: [], images: []}, action) => {
     switch(action.type){
-        // case "backgound_moving":
-        //     return {
-        //         ...state,
-        //         bgMoving: action.value
-        //     }
+        case "backgound_moving":
+            return {
+                ...state,
+                bgMoving: action.value
+            }
         case "youtube_add":
             const new_videos = [...state.videos, action.value];
             return {

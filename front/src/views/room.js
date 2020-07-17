@@ -48,12 +48,10 @@ function Room(props) {
     
     return (
     <div data-v-12a888fb="" className="space">
-        <div data-v-2db9ff64="" className="app-header" data-v-12a888fb="">
-            <a data-v-2db9ff64="" href="/" target="_blank">
-                <img data-v-2db9ff64="" className="logo" src={logosvg} alt='logosvg' style={{display: 'none'}}/>
-                <img data-v-2db9ff64="" className="logo-small" src={logosmallsvg} alt='logosmallsvg' style={{display: 'none'}}/>
-            </a>
-            <div data-v-2f32af68="" className="space-name">{query.space}</div>
+        <div data-v-2db9ff64="" style={{ position: 'absolute', right: '10%', top: '5%'}} data-v-12a888fb="">
+            <div data-v-2f32af68="" >
+                {query.space}
+            </div>
         </div>
         <div data-v-a74c9690="" data-v-12a888fb="" className="entrance ent-div">
             <form data-v-a74c9690="" className="form" onSubmit={(e)=>handleSubmit(e)}>

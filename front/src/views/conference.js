@@ -26,6 +26,7 @@ function Conference(props) {
     const users = useSelector(state=>state.users);
     const videoObj = useSelector(state=>state.screens.videos);
     const imageObj = useSelector(state=>state.screens.images);
+    const bgMoving = useSelector(state=>state.screens.bgMoving);
 
     const [userClose, setUserClose] = useState(false);
     const [wheelScale, setWheelScale] = useState(1);
@@ -33,23 +34,10 @@ function Conference(props) {
     const handleSetUserClose = (value) => {
         setUserClose(value)
     }
-    // const handleWheelChangeValue = (value) => {
-    //     setWheelChange(value)
-    // }
     const handleWheel = (e) => {
         console.log(e, e.scale)
         setWheelScale(e.scale)
     }
-    const Container = styled.div`
-        height: 100vh;
-        width: 100vw;
-        background-image: url(${img_big});
-    `;
-
-    // const defScale = window.localStorage.getItem('windowScale')
-    // const defPosX = parseInt(window.localStorage.getItem('windowScreenWidth') / 2)
-    // const defPosY = parseInt(window.localStorage.getItem('windowScreenHeight') / 2)
-    // console.log('----------------', defScale, defPosX, defPosY)
     
     return (
         <React.Fragment>
@@ -59,13 +47,13 @@ function Conference(props) {
                     enablePadding={false}
                     enablePanPadding={false}
                     scalePadding={{ disabled: true}}
-                    options={{ minScale: 1, maxScale: 4}}
+                    options={{ disabled: bgMoving, minScale: 1, maxScale: 4}}
                     wheel={{ step: 200 }}
                     pan={{ paddingSize: 0, padding: true}}
-                    onWheel={handleWheel}
+                    onWheel={(e)=>{handleWheel(e)}}
                 >
                     <TransformComponent>
-                        <Container id={'background_div'} >
+                        <div id={'background_div'} style={{backgroundImage: `url(${img_big})`, height: '100vh', width: '100vw'}}>
                             {
                                 users.map((user) => <Screen key={user.id} curScale={wheelScale} user={user} />)
                             }
@@ -75,7 +63,7 @@ function Conference(props) {
                             {
                                 imageObj.map((image) => <ImageUpload key={image.value} image={image} curScale={wheelScale} userClose={userClose} room={query.space} />)
                             }
-                        </Container>                    
+                        </div>                    
                     </TransformComponent>
                 </TransformWrapper>
             </div>
