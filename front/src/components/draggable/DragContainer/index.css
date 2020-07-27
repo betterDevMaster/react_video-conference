@@ -1,0 +1,4 @@
+.drag-container {
+    position: relative;
+    overflow: hidden;
+}

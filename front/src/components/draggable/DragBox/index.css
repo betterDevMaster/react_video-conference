@@ -1,0 +1,66 @@
+.drag-box {
+    position: absolute;
+    display: inline-block;
+    /* overflow: hidden; */
+    /* border: 4px solid white; */
+    background-color: rgba(100, 255, 53, 0.239);
+}
+
+.circle {
+    border-radius: 50%;
+}
+.circle-arrow {
+    border: 4px solid rgb(255, 255, 0);
+    position: absolute;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 50%;
+    border-bottom-left-radius: 50%;
+    border-bottom-right-radius: 50%;
+}
+.rectangle {
+    border-radius: 2px;
+}
+.drag-move {
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 10000;
+}
+.drag-size-x {
+    cursor: e-resize;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    right: 0px;
+    z-index: 10001;
+}
+.drag-size-y {
+    cursor: s-resize;
+    width: 100%;
+    height: 10px;
+    position: absolute;
+    bottom: 0px;
+    z-index: 10001;
+}
+.drag-size-xy {
+    cursor: se-resize;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    z-index: 10002;
+}
+.tip {
+    position: relative;
+    width: 100%;
+    text-align: center;
+}
+.tip-pan{
+    margin: 0 auto;
+    font-size: '16px';
+    background-color: #5494a6;
+    border-radius: 10px;
+    padding: 10px;
+}

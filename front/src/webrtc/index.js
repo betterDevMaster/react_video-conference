@@ -491,7 +491,8 @@ class WebRTC {
                     'image-position', image);
             })
             
-            WebRTC.getInstance().client.sendPeerMessage({room: WebRTC.getInstance().roomName}, 'media-presence', {type:'screenshare', status: WebRTC.getInstance().enableScreenShare?'on':'off'});
+            if (WebRTC.getInstance().client)
+                WebRTC.getInstance().client.sendPeerMessage({room: WebRTC.getInstance().roomName}, 'media-presence', {type:'screenshare', status: WebRTC.getInstance().enableScreenShare?'on':'off'});
             
             return;
         })
@@ -602,15 +603,17 @@ class WebRTC {
         });
     }
     updatePeerPosition(content){
-        WebRTC.getInstance().dispatch({type: 'user_position', value: {id: content.position.peerId, defPosX: content.position.x, defPosY: content.position.y} })
+        // console.log('updatePeerPosition: -----', content)
+        WebRTC.getInstance().dispatch({type: 'user_position', value: {id: content.id, defPosX: content.position.x, defPosY: content.position.y, zoom: content.zoom} })
     }
-    updateMyPosition( position ){
+    updateMyPosition( position, scale ){
         if(this.client){
             if(!position)
                 position = this.myPosition;
             this.myPosition = position;
 
-            this.client.sendPeerMessage({room: this.roomName}, 'set_peer_position', {id: this.client.getId(), position:this.myPosition});
+            // console.log('updateMyPosition : --------', this.client.getId(), position, scale)
+            this.client.sendPeerMessage({room: this.roomName}, 'set_peer_position', {id: this.client.getId(), position:this.myPosition, zoom: scale});
         }
     }
 }
