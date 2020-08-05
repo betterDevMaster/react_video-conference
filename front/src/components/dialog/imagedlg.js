@@ -10,6 +10,7 @@ function ImageDialog(props){
     const [imagePreviewUrl, setImagePreviewUrl] = useState(null)
     const [uploadClick, setUploadClick] = useState(true)
     const [fileName, setFileName] = useState('')
+    const [imgSize, setImgSize] = useState({width: 0, height: 0})
     const dispatch = useDispatch()
 
     const handleCancel = (event) => {
@@ -18,16 +19,18 @@ function ImageDialog(props){
         setImagePreviewUrl(null)
     }
     const handleSubmit = (event) => {
-        const imageWidth = 230
-        const imageHeight = 130
+        console.log('---------', event)
+        const imageWidth = parseInt(imgSize.width/3)
+        const imageHeight = parseInt(imgSize.height/3)
         
-        const draggableBack = document.getElementsByClassName('react-transform-element')[0]
-        const posMe = Utils.getPositionFromTransformWithScale(draggableBack);
-        const calc_def_x = (Math.abs(-posMe.x) + Utils.width() / 2 - imageWidth / 2 * posMe.scale) / posMe.scale
-        const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2 - imageHeight / 2 * posMe.scale) / posMe.scale
+        const draggableBack = document.getElementsByClassName('drag-container')[0]
+        const posMe = Utils.getPositionFromStyle(draggableBack);
+        const scaleMe = Utils.getValueFromAttr(draggableBack, 'zoom').value;
+        const calc_def_x = (Math.abs(-posMe.x) + Utils.width() / 2 ) / scaleMe
+        const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2 ) / scaleMe
 
-        dispatch({type: 'image_add', value:{name: fileName, id: 'me', username: props.uname, value: imagePreviewUrl, transform: `translate(${calc_def_x}px, ${calc_def_y}px)`, width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y}})
-        WebRTC.getInstance().imageAdd({imageId: imagePreviewUrl, name: fileName, username: props.uname, transform: `translate(${calc_def_x}px, ${calc_def_y}px)`, width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y})
+        dispatch({type: 'image_add', value:{name: fileName, id: 'me', username: props.uname, value: imagePreviewUrl, width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y}})
+        WebRTC.getInstance().imageAdd({imageId: imagePreviewUrl, name: fileName, username: props.uname, width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y})
 
         setImagePreviewUrl(null)
         window.$('#imagedialog').plainModal('close')
@@ -35,7 +38,15 @@ function ImageDialog(props){
     const fileChangedHandler = (event) => {
         let reader = new FileReader();
         setFileName(event.target.files[0].name)
-        reader.onloadend = () => {
+        reader.onload = function () {
+            var img = new Image;
+            img.onload = function() {
+                setImgSize({width: img.width, height: img.height})
+                console.log("The width of the image is " + img.width + "px.");
+            };
+            img.src = reader.result;
+        }
+        reader.onloadend = (e) => {
             setImagePreviewUrl(reader.result)
         }
         reader.readAsDataURL(event.target.files[0])

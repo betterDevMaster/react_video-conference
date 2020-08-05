@@ -28,7 +28,7 @@ export default class DragBox extends React.Component {
             return {
                 offset: props.offset,
                 scale: props.scale,
-                style: calcStyle(props, state),
+                style: calcStyle(props, state)
             };
         else {
             return {
@@ -38,7 +38,9 @@ export default class DragBox extends React.Component {
                 position: {
                     x: props.initialRect.left | 0,
                     y: props.initialRect.top | 0
-                }
+                },
+                width: props.initialRect.width | 0,
+                height: props.initialRect.height | 0
             };
         }
     }
@@ -58,7 +60,11 @@ export default class DragBox extends React.Component {
     }
     // calculate relative position to the mouse and set dragging=true
     onMouseDown = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        // return;
         // only left mouse button
+        if (!this.props.draggable) return;
         const ele = document.elementFromPoint(e.clientX, e.clientY);
         let dragType = '';
         if (e.button === 0) {
@@ -93,43 +99,37 @@ export default class DragBox extends React.Component {
                 h: (e.pageY / this.state.scale) * 2 - this.state.height * this.props.zoom
             }
         });
-
-        // const posDown = {
-        //     x: this.state.position.x * this.props.scale,
-        //     y: this.state.position.y * this.props.scale
-        // };
-        // if (this.props.onMouseDown) this.props.onMouseDown(posDown);
-
-        e.stopPropagation();
-        e.preventDefault();
     };
     onMouseUp = (e) => {
+        const newPos = {
+            x: this.myRef.current.offsetLeft / this.state.scale,
+            y: this.myRef.current.offsetTop / this.state.scale
+        };
+
         this.setState({ dragging: false });
 
-        // const posUp = {
-        //     x: this.state.position.x * this.props.scale,
-        //     y: this.state.position.y * this.props.scale
-        // };
-        // if (this.props.onMouseUp) this.props.onMouseUp(posUp);
+        if (this.props.onMouseUp) this.props.onMouseUp(this.myRef.current, newPos, this.state.scale);
 
         e.stopPropagation();
         e.preventDefault();
     };
     onMouseMove = (e) => {
+        const newPos = {
+            x: (e.pageX - this.state.rel.x) / this.state.scale,
+            y: (e.pageY - this.state.rel.y) / this.state.scale
+        };
+
         switch (this.state.dragType) {
             case 'move':
                 {
-                    const newPos = {
-                        x: (e.pageX - this.state.rel.x) / this.state.scale,
-                        y: (e.pageY - this.state.rel.y) / this.state.scale
-                    };
                     newPos.x = Math.max(1, Math.min(this.myRef.current.parentNode.parentNode.clientWidth / this.state.scale - 1, newPos.x));
-                    newPos.y = Math.max(1, Math.min(this.myRef.current.parentNode.parentNode.clientHeight / this.state.scale - 1, newPos.y));
+                    newPos.y = Math.max(
+                        1,
+                        Math.min(this.myRef.current.parentNode.parentNode.clientHeight / this.state.scale - 1, newPos.y)
+                    );
                     this.setState({
                         position: newPos
                     });
-
-                    if (this.props.onMouseMove) this.props.onMouseMove(this.myRef.current, newPos, this.state.scale);
                 }
                 break;
             case 'resize-x':
@@ -174,16 +174,12 @@ export default class DragBox extends React.Component {
                 break;
             default:
         }
+        if (this.props.onMouseMove) this.props.onMouseMove(this.myRef.current, newPos, this.state.scale);
 
-        // const posMove = {
-        //     x: this.state.position.x * this.props.scale,
-        //     y: this.state.position.y * this.props.scale
-        // };
-        // if (this.props.onMouseMove) this.props.onMouseMove(posMove);
-
-        e.stopPropagation();
+        // e.stopPropagation();
         e.preventDefault();
     };
+
     handleClickSmall = (e) => {
         const pos = {
             x: this.state.position.x * this.props.scale,
@@ -196,33 +192,53 @@ export default class DragBox extends React.Component {
 
     render() {
         return (
-            < div
-                onMouseEnter={(e) => { this.setState({ tipState: true }) }}
-                onMouseLeave={(e) => { this.setState({ tipState: false }) }}>
-                <div ref={this.myRef} className={`drag-box ${this.props.type}`} style={this.state.style} onMouseUp={this.onMouseUp} onMouseDown={this.onMouseDown}>
+            <div
+                onMouseEnter={(e) => {
+                    this.props.type === 'circle' ? this.setState({ tipState: true }) : this.setState({ tipState: false });
+                }}
+                onMouseLeave={(e) => {
+                    this.setState({ tipState: false });
+                }}
+            >
+                <div
+                    ref={this.myRef}
+                    className={`drag-box ${this.props.type}`}
+                    style={this.state.style}
+                    onMouseUp={this.onMouseUp}
+                    onMouseDown={this.onMouseDown}
+                >
                     {this.props.sizable && <div className="drag-size-x" ref={this.resizeXRef} onMouseDown={this.onMouseDown} />}
                     {this.props.sizable && <div className="drag-size-y" ref={this.resizeYRef} onMouseDown={this.onMouseDown} />}
                     {this.props.sizable && <div className="drag-size-xy" ref={this.resizeXYRef} onMouseDown={this.onMouseDown} />}
-                    <div className="drag-move" ref={this.moveRef} onMouseDown={this.onMouseDown} />
-
+                    <div className={'drag-' + this.props.dragType} ref={this.moveRef} onMouseDown={this.onMouseDown} />
+                    {/* <div
+                        className={this.props.dragType === 'title' ? 'drag-title' : 'drag-move'}
+                        ref={this.moveRef}
+                        onMouseDown={this.onMouseDown}
+                    /> */}
                     {this.props.children}
-                    <div className='tip' >{this.state.tipState ? (<span className='tip-pan'>{this.props.tip}</span>) : ''}</div>
-
+                    {this.state.tipState && (
+                        <div className="tip">
+                            <span className="tip-pan"> {this.props.tip} </span>
+                        </div>
+                    )}
                 </div>
-
-                {
-                    this.state.style.small && (
-                        <div
-                            className="circle-arrow"
-                            style={{ ...this.state.style, borderColor: this.props.draggable ? 'yellow' : 'white', transform: `translate(-50%, -50%) rotate(${this.state.style.angle}deg)` }}
-                            onMouseDown={this.handleClickSmall}
-                        />
-                    )
-                }
-            </div >
+                {this.state.style.small && (
+                    <div
+                        className="circle-arrow"
+                        style={{
+                            ...this.state.style,
+                            borderColor: this.props.draggable ? 'yellow' : 'white',
+                            transform: `translate(-50%, -50%) rotate(${this.state.style.angle}deg)`
+                        }}
+                        onMouseDown={this.handleClickSmall}
+                    />
+                )}
+            </div>
         );
     }
 }
+
 function calcStyle(props, state) {
     const style = {
         left: state.position.x * props.scale,
@@ -251,7 +267,7 @@ function calcStyle(props, state) {
             style.angle =
                 -45 +
                 (180 / Math.PI) *
-                Math.atan2(-props.offset.y + stage.clientHeight / 2 - style.top, -props.offset.x + stage.clientWidth / 2 - style.left);
+                    Math.atan2(-props.offset.y + stage.clientHeight / 2 - style.top, -props.offset.x + stage.clientWidth / 2 - style.left);
             style.width = smallCircleSize;
             style.height = smallCircleSize;
             style.left = offset.x;
@@ -261,6 +277,7 @@ function calcStyle(props, state) {
     }
     return style;
 }
+
 function calcOffest(parentRect, pos, smallCircleSize) {
     var offset = { x: pos.x, y: pos.y };
     if (pos.x > parentRect.left && pos.x < parentRect.right && pos.y > parentRect.top && pos.y < parentRect.bottom) return null;

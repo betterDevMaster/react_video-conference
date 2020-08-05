@@ -31,6 +31,26 @@ export default class Utils{
             return {x:0, y:0}
         }
     }
+    static getPositionAndSizeFromStyle(ele){
+        try{
+            var left = ele.style.left.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)[0]
+            var top = ele.style.top.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)[0]
+            var width = ele.style.width.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)[0]
+            var height = ele.style.height.match(/[+-]?\d+(?:\.\d+)?/g).map(Number)[0]
+            return {x: left, y: top, width: width, height: height}
+        } catch(e){
+            console.error(e);
+            return {x:0, y:0, width: 0, height: 0}
+        }
+    }
+    static getValueFromAttr(ele, attrName){
+        try{
+            return {value: ele.getAttribute(attrName).match(/[+-]?\d+(?:\.\d+)?/g).map(Number)[0]}
+        } catch(e){
+            console.error(e);
+            return {value: ''}
+        }
+    }
     static setPositionOfHtmlElement(ele, pos){
         try{
             ele.style.left = pos.x + 'px';

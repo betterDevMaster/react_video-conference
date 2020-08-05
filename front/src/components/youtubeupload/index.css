@@ -19,3 +19,12 @@
     /* left: calc(-15%);
     top: calc(-15%); */
 }
+
+.cus_close {
+    position: absolute;
+    height: auto;
+    top: -22px;
+    right: 11px;
+    z-index: 101;
+    cursor: pointer;
+}

@@ -121,9 +121,10 @@ export default class DragContainer extends React.Component {
                     background: `url(${this.props.background})`,
                     backgroundSize: 'cover',
                     width: this.props.width * this.state.zoom,
-                    height: this.props.height * this.state.zoom
+                    height: this.props.height * this.state.zoom,
                     // transform: `scale(${this.state.zoom})`,
                 }}
+                zoom={this.state.zoom}
             >
                 {this.props.children}
             </div>

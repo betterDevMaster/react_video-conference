@@ -1,41 +1,39 @@
-import React, { Component, useState, useEffect } from "react";
+import React, { Component, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import * as qs from 'query-string'
+// import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import * as qs from 'query-string';
 
 import Navbar from '../components/navbar';
 import WebRTC from '../webrtc';
 import Screen from '../components/screen';
 import YoutubeUpload from '../components/youtubeupload';
 import ImageUpload from '../components/imageupload';
-import Tip from '../components/tip';
 import DragContainer from '../components/draggable/DragContainer';
-// import DragBox from '../components/draggable/DragBox'
+import Utils from '../utils/position';
 
 import img_small from '../images/map-small@2x.0c2a372b.png';
 import img_big from '../images/map-big@2x.44a3f15c.png';
 
 import './index.css';
-import Utils from "../utils/position";
 
 function Conference(props) {
     useEffect(() => {
         WebRTC.getInstance().startConference(dispatch, null, query.space, query.uname, 2);
-    }, [])
+    }, []);
 
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const query = qs.parse(props.location.search);
-    const users = useSelector(state => state.users);
-    const videoObj = useSelector(state => state.screens.videos);
-    const imageObj = useSelector(state => state.screens.images);
+    const users = useSelector((state) => state.users);
+    const videos = useSelector((state) => state.screens.videos);
+    const images = useSelector((state) => state.screens.images);
     const [userClose, setUserClose] = useState(false);
 
     const [pos, setPos] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
 
     const handleSetUserClose = (value) => {
-        setUserClose(value)
-    }
+        setUserClose(value);
+    };
 
     const handleDrag = (dom, pos) => {
         setPos(pos);
@@ -49,46 +47,126 @@ function Conference(props) {
         setPos({
             x: Math.max(Math.min(0, stage.clientWidth / 2 - smallPos.x)),
             y: Math.min(0, stage.clientHeight / 2 - smallPos.y)
-        })
-    }
-    const handleDragMe = (me, pos) => {
-        users.forEach(user => {
+        });
+    };
+    const handleDragMe = (node, me, pos) => {
+        users.forEach((user) => {
             if (user !== me) {
-                const dist = Math.max(1, Math.sqrt((pos.x - user.defPosX) * (pos.x - user.defPosX) +
-                    (pos.y - user.defPosY) * (pos.y - user.defPosY)))
-                const scaleVal = Math.max(0.3, Math.min(1, 150 / (dist)))
+                const dist = Math.max(
+                    1,
+                    Math.sqrt((pos.x - user.defPosX) * (pos.x - user.defPosX) + (pos.y - user.defPosY) * (pos.y - user.defPosY))
+                );
+                const scaleVal = Math.max(0.3, Math.min(1, 150 / dist));
 
-                WebRTC.getInstance().updateMyPosition(pos, scaleVal)
-                dispatch({ type: 'user_position', value: { id: user.id, zoom: scaleVal } })
+                WebRTC.getInstance().updateMyPosition(pos, scaleVal);
+                dispatch({ type: 'user_position', value: { id: user.id, zoom: scaleVal } });
+                // dispatch({ type: 'user_position', value: { id: user.id, defPosX: Math.round(pos.x*scaleVal), defPosY: Math.round(pos.y*scaleVal), zoom: scaleVal } });
             }
         });
-    }
-    
-    const handleDragYoutubeMe = (me, pos) => {
-        users.forEach(user => {
-            if (user !== me) {
-                const dist = Math.max(1, Math.sqrt((pos.x - user.defPosX) * (pos.x - user.defPosX) +
-                    (pos.y - user.defPosY) * (pos.y - user.defPosY)))
-                const scaleVal = Math.max(0.3, Math.min(1, 150 / (dist)))
+    };
 
-                WebRTC.getInstance().updateMyPosition(pos, scaleVal)
-                dispatch({ type: 'user_position', value: { id: user.id, zoom: scaleVal } })
-            }
-        });
-    }
+    const getDistanceByPosition = (p1, p2) => {
+        return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+    };
+    const getDistanceByRectAndPosition = (rect, pos) => {
+        let distance = -1;
+        if (pos.x > rect.left && pos.x < rect.right) {
+            distance = Math.min(Math.abs(pos.y - rect.top), Math.abs(pos.y - rect.bottom));
+        }
+        if (pos.y > rect.top && pos.y < rect.bottom) {
+            if (distance === -1) distance = Math.min(Math.abs(pos.x - rect.left), Math.abs(pos.x - rect.right));
+            else distance = 0;
+        }
+        if (distance >= 0) return distance;
+        return Math.min(
+            Math.min(
+                getDistanceByPosition(pos, { x: rect.left, y: rect.top }),
+                getDistanceByPosition(pos, { x: rect.left, y: rect.bottom })
+            ),
+            Math.min(
+                getDistanceByPosition(pos, { x: rect.right, y: rect.top }),
+                getDistanceByPosition(pos, { x: rect.right, y: rect.bottom })
+            )
+        );
+    };
 
-    const handleDragImageMe = (me, pos) => {
-        users.forEach(user => {
-            if (user !== me) {
-                const dist = Math.max(1, Math.sqrt((pos.x - user.defPosX) * (pos.x - user.defPosX) +
-                    (pos.y - user.defPosY) * (pos.y - user.defPosY)))
-                const scaleVal = Math.max(0.3, Math.min(1, 150 / (dist)))
+    const handleDragMeForYoutube = (node, youtubeMute, me, videoplay, realCurTime) => {
+        const videoMe = Utils.getPositionAndSizeFromStyle(node);
 
-                WebRTC.getInstance().updateMyPosition(pos, scaleVal)
-                dispatch({ type: 'user_position', value: { id: user.id, zoom: scaleVal } })
-            }
-        });
-    }
+        const usersDom = document.getElementsByClassName('circle')
+        for (const _user of usersDom) {
+            const user = Utils.getPositionAndSizeFromStyle(_user);
+            const dist = getDistanceByRectAndPosition(
+                {
+                    left: videoMe.x - videoMe.width / 2,
+                    right: videoMe.x + videoMe.width / 2,
+                    top: videoMe.y - videoMe.height / 2,
+                    bottom: videoMe.y + videoMe.height / 2
+                },
+                {
+                    x: user.x,
+                    y: user.y
+                }
+            );
+            // const dist = Math.sqrt(
+            //     (videoMe.x - user.x) * (videoMe.x - user.x) + (videoMe.y - user.y) * (videoMe.y - user.y)
+            // ) 
+            // const limit = Math.sqrt(videoMe.width*videoMe.width + videoMe.height*videoMe.height)/2*1.2 ;
+
+            var vol = dist === 0 ? 1 : Math.max(0, Math.min(1, Math.pow(100 / dist, 2)));
+            if (vol < 1) vol = 0;
+
+            console.log('dist: vol:', videoMe, user, dist, vol);
+        }
+        // usersDom.forEach((_user) => {
+        //     const user = Utils.getPositionAndSizeFromStyle(_user);
+        //     console.log(videoMe, user)
+            // const dist = Math.sqrt(
+            //     (videoMe.x - user.defPosX) * (videoMe.x - user.defPosX) + (videoMe.y - user.defPosY) * (videoMe.y - user.defPosY)
+            // ) 
+            // const limit = Math.sqrt(videoMe.width*videoMe.width + videoMe.height*videoMe.height)/2*1.2 ;
+            // getDistanceByRectAndPosition(
+            //     {
+            //         left: videoMe.x - videoMe.width / 2,
+            //         right: videoMe.x + videoMe.width / 2,
+            //         top: videoMe.y - videoMe.height / 2,
+            //         bottom: videoMe.y + videoMe.height / 2
+            //     },
+            //     {
+            //         x: user.defPosX,
+            //         y: user.defPosY
+            //     }
+            // );
+
+            // var vol = dist === 0 ? 1 : Math.max(0, Math.min(1, Math.pow(limit / dist, 2)));
+            // if (vol < 1) vol = 0;
+
+            // console.log('dist: vol:', videoMe, user.defPosX, user.defPosY, dist, vol * 100);
+            // WebRTC.getInstance().youtubePosition({
+            //     name: me.name,
+            //     width: node.clientWidth,
+            //     height: node.clientHeight,
+            //     defX: videoMe.x,
+            //     defY: videoMe.y,
+            //     volume: vol,
+            //     curtime: realCurTime,
+            //     videoplay: videoplay
+            // });
+            // dispatch({
+            //     type: 'youtube_position',
+            //     value: {
+            //         name: me.name,
+            //         width: node.clientWidth,
+            //         height: node.clientHeight,
+            //         defX: videoMe.x,
+            //         defY: videoMe.y,
+            //         volume: vol,
+            //         curtime: realCurTime,
+            //         videoplay: videoplay
+            //     }
+            // });
+        // });
+    };
 
     return (
         <div className="App">
@@ -104,7 +182,7 @@ function Conference(props) {
                     top: 0
                 }}
             >
-                <Navbar onSetUserClose={handleSetUserClose} videoObj={videoObj} imageObj={imageObj} query={query} />
+                <Navbar onSetUserClose={handleSetUserClose} videos={videos} images={images} query={query} />
                 <DragContainer
                     // debug
                     fitParent
@@ -118,49 +196,35 @@ function Conference(props) {
                     maxZoom={3}
                     minZoom={0.2}
                 >
-                    {
-                        users.map((user) => 
-                            <Screen 
-                                key={user.id} 
-                                pos={pos} 
-                                zoom={zoom} 
-                                user={user} 
-                                onClickSmall={handleClickSmall} 
-                                onDrag={handleDragMe} 
-                            />
-                        )
-                    }
-                    {
-                        videoObj.map((video) => 
-                            <YoutubeUpload 
-                                key={video.name} 
-                                video={video} 
-                                pos={pos} 
-                                zoom={zoom} 
-                                userClose={userClose} 
-                                room={query.space}
-                                onDrag={handleDragYoutubeMe} 
-                            />
-                        )
-                    }
-                    {
-                        imageObj.map((image) => 
-                            <ImageUpload 
-                                key={image.value} 
-                                image={image} 
-                                pos={pos} 
-                                zoom={zoom} 
-                                userClose={userClose} 
-                                room={query.space} 
-                                onDrag={handleDragImageMe} 
-                            />
-                        )
-                    }
+                    {users.map((user) => (
+                        <Screen
+                            key={user.id}
+                            pos={pos}
+                            zoom={zoom}
+                            user={user}
+                            onClickSmall={handleClickSmall}
+                            onDrag={user.id === 'me' ? handleDragMe : null}
+                        />
+                    ))}
+                    {videos.map((video) => (
+                        <YoutubeUpload
+                            key={video.name}
+                            video={video}
+                            pos={pos}
+                            zoom={zoom}
+                            userClose={userClose}
+                            room={query.space}
+                            onDrag={video.id === 'me' ? handleDragMeForYoutube : null}
+                            // onYoutubeDrag={handleYoutubeDragMe}
+                        />
+                    ))}
+                    {images.map((image) => (
+                        <ImageUpload key={image.value} image={image} pos={pos} zoom={zoom} userClose={userClose} room={query.space} />
+                    ))}
                 </DragContainer>
             </div>
-            <Tip />
         </div>
     );
 }
 
-export default Conference
+export default Conference;

@@ -23,7 +23,7 @@ import close from '../../images/close.svg'
 
 import './index.css';
 
-const Navbar = React.memo(props => {
+const   Navbar = React.memo(props => {
     const dispatch = useDispatch()
     const users = useSelector(state=>state.users);
     const camera = useSelector(state => state.buttons.camera);

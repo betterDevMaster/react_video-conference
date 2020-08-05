@@ -128,28 +128,17 @@ class WebRTC {
     youtubePosition (value) {
         this.youtubes.forEach((youtube)=>{
             if(youtube.name === value.name) {
-                youtube.transform = value.transform;
                 youtube.defX = value.defX;
                 youtube.defY = value.defY;
                 youtube.width = value.width;
                 youtube.height = value.height;
+                youtube.volume = value.volume;
+                youtube.curtime = value.curtime;
+                youtube.videoplay = value.videoplay;
             }
         })
-        console.log('------------youtubePosition', value, this.youtubes)
         if(this.client)
             this.client.sendPeerMessage({room: this.roomName}, 'youtube-position', value);
-    }
-    youtubePlay (value) {
-        this.youtubes.forEach((youtube)=>{
-            if(youtube.name === value.name) {
-                youtube.videoplay = value.videoplay;
-                youtube.videoplaying = value.videoplaying;
-                youtube.curtime = value.curtime;
-            }
-        })
-
-        if(this.client)
-            this.client.sendPeerMessage({room: this.roomName}, 'youtube-play', value);
     }
     youtubeAdd (value) {
         WebRTC.getInstance().youtubes.push(value)
@@ -164,7 +153,6 @@ class WebRTC {
         })
     }
     imageAdd (value) {
-        // value.transform = 'translate(0px, 0px)';
         WebRTC.getInstance().images.push(value)
         if(WebRTC.getInstance().client)
             WebRTC.getInstance().client.sendPeerMessage({room: this.roomName}, 'image-add', value);
@@ -172,7 +160,6 @@ class WebRTC {
     imagePosition (value) {
         this.images.forEach((image)=>{
             if(image.name === value.name) {
-                image.transform = value.transform
                 image.defX = value.defX;
                 image.defY = value.defY;
                 image.width = value.width;
@@ -400,21 +387,21 @@ class WebRTC {
                 WebRTC.getInstance().updatePeerPosition(content)
             // Youtube Handle
             } else if (msgType === 'youtube-position') {
-                dispatch({type:'youtube_position', value:{username: client.idToName(peerId), name: content.name, videoId: peerId, transform: content.transform, 
-                    width: content.width, height: content.height, defX: content.defX, defY: content.defY}})
-            } else if (msgType === 'youtube-play') {
-                dispatch({type:'youtube_play', value:{ name: content.name, videoplay: content.videoplay, curtime: content.curtime, videoplaying: content.videoplaying}})
+                dispatch({type:'youtube_position', value:{username: client.idToName(peerId), name: content.name, videoId: peerId, width: content.width, 
+                    height: content.height, defX: content.defX, defY: content.defY, volume: content.volume, curtime: content.curtime, videoplay: content.videoplay}})
             } else if (msgType === 'youtube-add') {
-                dispatch({type:'youtube_add', value:{name: content.name, id: peerId, value: content.videoId, transform: content.transform, width: content.width, height: content.height, defX: content.defX, defY: content.defY}})
+                dispatch({type:'youtube_add', value:{name: content.name, id: peerId, value: content.videoId, 
+                    width: content.width, height: content.height, defX: content.defX, defY: content.defY}})
             } else if (msgType === 'youtube-remove') {
                 console.log('youtbut_remove: ', content)
                 dispatch({type:'youtube_remove', name:content.name})
             // Image Handle
             } else if (msgType === 'image-position') {
-                dispatch({type:'image_position', value:{username: client.idToName(peerId), name: content.name, imageid: peerId, transform: content.transform, 
+                dispatch({type:'image_position', value:{username: client.idToName(peerId), name: content.name, imageid: peerId, 
                     width: content.width, height: content.height, defX: content.defX, defY: content.defY}})
             } else if (msgType === 'image-add') {
-                dispatch({type:'image_add', value:{name: content.name, id: peerId, value: content.imageId, transform: content.transform, width: content.width, height: content.height, defX: content.defX, defY: content.defY}})
+                dispatch({type:'image_add', value:{name: content.name, id: peerId, value: content.imageId, 
+                    width: content.width, height: content.height, defX: content.defX, defY: content.defY}})
             } else if (msgType === 'image-remove') {
                 dispatch({type:'image_remove', name:content.name})
             // Navbar Handle
@@ -475,9 +462,6 @@ class WebRTC {
                 WebRTC.getInstance().client.sendPeerMessage(
                     {rtcId: peerId}, 
                     'youtube-add', youtube);
-                WebRTC.getInstance().client.sendPeerMessage(
-                    {rtcId: peerId}, 
-                    'youtube-play', youtube);
                 WebRTC.getInstance().client.sendPeerMessage(
                     {rtcId: peerId}, 
                     'youtube-position', youtube);

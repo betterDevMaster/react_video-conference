@@ -46,16 +46,19 @@ function VideoDialog(props){
 
         const videoId = getId(video.value);
 
-        const videoWidth = 250
-        const videoHeight = 140
+        const videoWidth = 350
+        const videoHeight = 240
         
-        const draggableBack = document.getElementsByClassName('react-transform-element')[0]
-        const posMe = Utils.getPositionFromTransformWithScale(draggableBack);
-        const calc_def_x = (Math.abs(-posMe.x) + Utils.width() / 2 - videoWidth / 2 * posMe.scale) / posMe.scale
-        const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2 - videoHeight / 2 * posMe.scale) / posMe.scale
+        const draggableBack = document.getElementsByClassName('drag-container')[0]
+        const posMe = Utils.getPositionFromStyle(draggableBack);
+        const scaleMe = Utils.getValueFromAttr(draggableBack, 'zoom').value;
+        const calc_def_x = (Math.abs(-posMe.x) + Utils.width() / 2 ) / scaleMe
+        const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2 ) / scaleMe
 
-        dispatch({type: 'youtube_add', value:{name: videoId, id: 'me', transform: `translate(${calc_def_x}px, ${calc_def_y}px)`, username: props.uname, value: videoId, width: videoWidth, height: videoHeight, defX: calc_def_x, defY: calc_def_y}})
-        WebRTC.getInstance().youtubeAdd({videoId: videoId, name: videoId, transform: `translate(${calc_def_x}px, ${calc_def_y}px)`, username: props.uname, width: videoWidth, height: videoHeight, defX: calc_def_x, defY: calc_def_y})
+        dispatch({type: 'youtube_add', value:{name: videoId, id: 'me', username: props.uname, value: videoId, width: videoWidth, 
+            height: videoHeight, defX: calc_def_x, defY: calc_def_y, volume: 100, curtime: 0, videoplay: true}})
+        WebRTC.getInstance().youtubeAdd({videoId: videoId, name: videoId, username: props.uname, width: videoWidth, 
+            height: videoHeight, defX: calc_def_x, defY: calc_def_y, volume: 100, curtime: 0, videoplay: true})
 
         video.value = ''
         window.$('#videodialog').plainModal('close')
