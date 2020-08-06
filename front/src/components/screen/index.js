@@ -16,7 +16,7 @@ const Screen = React.memo(props => {
     }, []);
 
     const handleDrag = (node, pos, scale) => {
-        // dispatch({ type: 'user_position', value: {id: props.user.id, defPosX: Math.round(pos.x*scale), defPosY: Math.round(pos.y*scale) } })
+        dispatch({ type: 'user_position', value: {id: props.user.id, defPosX: pos.x, defPosY: pos.y, zoom: scale } })
 
         if (props.onDrag) props.onDrag(node, props.user, pos, scale);
     }
@@ -29,7 +29,7 @@ const Screen = React.memo(props => {
             initialRect={{ left: props.user.defPosX, top: props.user.defPosY, width: 100, height: 100 }}
             zIndex={props.user.id === 'me' ? 50 : 25}
             onClickSmall={props.onClickSmall}
-            onMouseUp={handleDrag}
+            onMouseMove={handleDrag}
             tip={props.user.name}
             draggable = {props.user.id === 'me' ? true : false}
             sizable = {false}

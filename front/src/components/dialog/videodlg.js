@@ -56,9 +56,9 @@ function VideoDialog(props){
         const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2 ) / scaleMe
 
         dispatch({type: 'youtube_add', value:{name: videoId, id: 'me', username: props.uname, value: videoId, width: videoWidth, 
-            height: videoHeight, defX: calc_def_x, defY: calc_def_y, volume: 100, curtime: 0, videoplay: true}})
+            height: videoHeight, defX: calc_def_x, defY: calc_def_y, volume: 100, curtime: 0, videoplay: true, isDrag: false}})
         WebRTC.getInstance().youtubeAdd({videoId: videoId, name: videoId, username: props.uname, width: videoWidth, 
-            height: videoHeight, defX: calc_def_x, defY: calc_def_y, volume: 100, curtime: 0, videoplay: true})
+            height: videoHeight, defX: calc_def_x, defY: calc_def_y, volume: 100, curtime: 0, videoplay: true, isDrag: false})
 
         video.value = ''
         window.$('#videodialog').plainModal('close')

@@ -60,8 +60,7 @@ function Conference(props) {
 
                 WebRTC.getInstance().updateMyPosition(pos, scaleVal);
                 dispatch({ type: 'user_position', value: { id: user.id, zoom: scaleVal } });
-                // dispatch({ type: 'user_position', value: { id: user.id, defPosX: Math.round(pos.x*scaleVal), defPosY: Math.round(pos.y*scaleVal), zoom: scaleVal } });
-            }
+            } 
         });
     };
 
@@ -90,82 +89,51 @@ function Conference(props) {
         );
     };
 
-    const handleDragMeForYoutube = (node, youtubeMute, me, videoplay, realCurTime) => {
+    const handleDragMeForYoutube = (node, me, videoplay, realCurTime, userMe) => {
         const videoMe = Utils.getPositionAndSizeFromStyle(node);
+        const dist = getDistanceByRectAndPosition(
+            {
+                left: videoMe.x - videoMe.width / 2,
+                right: videoMe.x + videoMe.width / 2,
+                top: videoMe.y - videoMe.height / 2,
+                bottom: videoMe.y + videoMe.height / 2
+            },
+            {
+                x: userMe.defPosX,
+                y: userMe.defPosY
+            }
+        );
 
-        const usersDom = document.getElementsByClassName('circle')
-        for (const _user of usersDom) {
-            const user = Utils.getPositionAndSizeFromStyle(_user);
-            const dist = getDistanceByRectAndPosition(
-                {
-                    left: videoMe.x - videoMe.width / 2,
-                    right: videoMe.x + videoMe.width / 2,
-                    top: videoMe.y - videoMe.height / 2,
-                    bottom: videoMe.y + videoMe.height / 2
-                },
-                {
-                    x: user.x,
-                    y: user.y
-                }
-            );
-            // const dist = Math.sqrt(
-            //     (videoMe.x - user.x) * (videoMe.x - user.x) + (videoMe.y - user.y) * (videoMe.y - user.y)
-            // ) 
-            // const limit = Math.sqrt(videoMe.width*videoMe.width + videoMe.height*videoMe.height)/2*1.2 ;
+        var vol = dist === 0 ? 1 : Math.max(0, Math.min(1, Math.pow((100 / dist), 4)))
+        if (vol < 0.01) vol = 0
 
-            var vol = dist === 0 ? 1 : Math.max(0, Math.min(1, Math.pow(100 / dist, 2)));
-            if (vol < 1) vol = 0;
+        vol = isFinite(vol) ? vol : 1;
 
-            console.log('dist: vol:', videoMe, user, dist, vol);
-        }
-        // usersDom.forEach((_user) => {
-        //     const user = Utils.getPositionAndSizeFromStyle(_user);
-        //     console.log(videoMe, user)
-            // const dist = Math.sqrt(
-            //     (videoMe.x - user.defPosX) * (videoMe.x - user.defPosX) + (videoMe.y - user.defPosY) * (videoMe.y - user.defPosY)
-            // ) 
-            // const limit = Math.sqrt(videoMe.width*videoMe.width + videoMe.height*videoMe.height)/2*1.2 ;
-            // getDistanceByRectAndPosition(
-            //     {
-            //         left: videoMe.x - videoMe.width / 2,
-            //         right: videoMe.x + videoMe.width / 2,
-            //         top: videoMe.y - videoMe.height / 2,
-            //         bottom: videoMe.y + videoMe.height / 2
-            //     },
-            //     {
-            //         x: user.defPosX,
-            //         y: user.defPosY
-            //     }
-            // );
+        console.log('handleDrag------', videoplay, vol, realCurTime, userMe)
 
-            // var vol = dist === 0 ? 1 : Math.max(0, Math.min(1, Math.pow(limit / dist, 2)));
-            // if (vol < 1) vol = 0;
-
-            // console.log('dist: vol:', videoMe, user.defPosX, user.defPosY, dist, vol * 100);
-            // WebRTC.getInstance().youtubePosition({
-            //     name: me.name,
-            //     width: node.clientWidth,
-            //     height: node.clientHeight,
-            //     defX: videoMe.x,
-            //     defY: videoMe.y,
-            //     volume: vol,
-            //     curtime: realCurTime,
-            //     videoplay: videoplay
-            // });
-            // dispatch({
-            //     type: 'youtube_position',
-            //     value: {
-            //         name: me.name,
-            //         width: node.clientWidth,
-            //         height: node.clientHeight,
-            //         defX: videoMe.x,
-            //         defY: videoMe.y,
-            //         volume: vol,
-            //         curtime: realCurTime,
-            //         videoplay: videoplay
-            //     }
-            // });
-        // });
+        WebRTC.getInstance().youtubePosition({
+            name: me.name,
+            width: node.clientWidth,
+            height: node.clientHeight,
+            defX: videoMe.x,
+            defY: videoMe.y,
+            volume: vol,
+            curtime: realCurTime,
+            videoplay: videoplay,
+        });
+        dispatch({
+            type: 'youtube_position',
+            value: {
+                name: me.name,
+                width: node.clientWidth,
+                height: node.clientHeight,
+                defX: videoMe.x,
+                defY: videoMe.y,
+                volume: vol,
+                curtime: realCurTime,
+                videoplay: videoplay,
+            }
+        });
     };
 
     return (

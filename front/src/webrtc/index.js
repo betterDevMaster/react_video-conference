@@ -387,8 +387,8 @@ class WebRTC {
                 WebRTC.getInstance().updatePeerPosition(content)
             // Youtube Handle
             } else if (msgType === 'youtube-position') {
-                dispatch({type:'youtube_position', value:{username: client.idToName(peerId), name: content.name, videoId: peerId, width: content.width, 
-                    height: content.height, defX: content.defX, defY: content.defY, volume: content.volume, curtime: content.curtime, videoplay: content.videoplay}})
+                dispatch({type:'youtube_position', value:{username: client.idToName(peerId), name: content.name, videoId: peerId, width: content.width, height: content.height, 
+                    defX: content.defX, defY: content.defY, volume: content.volume, curtime: content.curtime, videoplay: content.videoplay}})
             } else if (msgType === 'youtube-add') {
                 dispatch({type:'youtube_add', value:{name: content.name, id: peerId, value: content.videoId, 
                     width: content.width, height: content.height, defX: content.defX, defY: content.defY}})

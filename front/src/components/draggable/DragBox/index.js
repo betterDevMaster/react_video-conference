@@ -24,24 +24,26 @@ export default class DragBox extends React.Component {
         };
     }
     static getDerivedStateFromProps(props, state) {
-        if (props.draggable)
-            return {
+        if (props.draggable) {
+            const newState = {
                 offset: props.offset,
                 scale: props.scale,
                 style: calcStyle(props, state)
             };
-        else {
-            return {
+            return newState;
+        } else {
+            const newState = {
                 offset: props.offset,
                 scale: props.scale,
                 style: calcStyle(props, state),
                 position: {
-                    x: props.initialRect.left | 0,
-                    y: props.initialRect.top | 0
+                    x: props.initialRect.left,
+                    y: props.initialRect.top
                 },
                 width: props.initialRect.width | 0,
                 height: props.initialRect.height | 0
             };
+            return newState;
         }
     }
 
@@ -114,11 +116,11 @@ export default class DragBox extends React.Component {
         e.preventDefault();
     };
     onMouseMove = (e) => {
+        if (e.button !== 0) return;
         const newPos = {
             x: (e.pageX - this.state.rel.x) / this.state.scale,
             y: (e.pageY - this.state.rel.y) / this.state.scale
         };
-
         switch (this.state.dragType) {
             case 'move':
                 {
@@ -127,6 +129,7 @@ export default class DragBox extends React.Component {
                         1,
                         Math.min(this.myRef.current.parentNode.parentNode.clientHeight / this.state.scale - 1, newPos.y)
                     );
+
                     this.setState({
                         position: newPos
                     });
@@ -194,10 +197,15 @@ export default class DragBox extends React.Component {
         return (
             <div
                 onMouseEnter={(e) => {
-                    this.props.type === 'circle' ? this.setState({ tipState: true }) : this.setState({ tipState: false });
+                    if (this.props.type === 'circle' && !this.state.tipState) {
+                        this.setState({ tipState: true });
+                    }
+                    if (this.props.type !== 'circle' && this.state.tipState) {
+                        this.setState({ tipState: false });
+                    }
                 }}
                 onMouseLeave={(e) => {
-                    this.setState({ tipState: false });
+                    if (this.state.tipState) this.setState({ tipState: false });
                 }}
             >
                 <div
@@ -241,10 +249,10 @@ export default class DragBox extends React.Component {
 
 function calcStyle(props, state) {
     const style = {
-        left: state.position.x * props.scale,
-        top: state.position.y * props.scale,
-        width: state.width * props.zoom,
-        height: state.height * props.zoom,
+        left: props.draggable ? state.position.x * props.scale : props.initialRect.left * props.scale,
+        top: props.draggable ? state.position.y * props.scale : props.initialRect.top * props.scale,
+        width: props.draggable ? state.width * props.zoom : props.initialRect.width * props.zoom,
+        height: props.draggable ? state.height * props.zoom : props.initialRect.height * props.zoom,
         zIndex: props.zIndex | 0,
         transform: `translate(-50%, -50%) scale(${props.scale})`
     };
