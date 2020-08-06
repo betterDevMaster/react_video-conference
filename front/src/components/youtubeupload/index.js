@@ -45,8 +45,8 @@ const YoutubeUpload = React.memo(props => {
         for (const _user of users) {
             if (_user.id === 'me' && dbRef && dbRef.current) {
                 setUserMe(_user)
-                console.log('users -----------', _user, userMe, realCurTime, videoRef.current.internalPlayer.isMuted())
-                if (props.onDrag) props.onDrag(dbRef.current.myRef.current, props.video, props.video.videoplay, realCurTime, userMe);
+                console.log('users -----------', _user, props.video.videoplay, props.video.volume, props.video.curtime)
+                if (props.onDrag) props.onDrag(dbRef.current.myRef.current, props.video, props.video.videoplay, props.video.curtime, userMe);
             }
         }
     }, [users])
@@ -55,8 +55,8 @@ const YoutubeUpload = React.memo(props => {
         if (videoRef && videoRef.current) {
             console.log('videoplay -----------', youtubeMute, props.video.videoplay, props.video.volume, props.video.curtime)
             videoRef.current.internalPlayer.setVolume(props.video.volume * 100 * (youtubeMute ==='off' ? 1: 0));
-            videoRef.current.internalPlayer.seekTo(props.video.curtime)
             if (props.video.videoplay) {
+                videoRef.current.internalPlayer.seekTo(props.video.curtime)
                 videoRef.current.internalPlayer.playVideo()
             }
             else 
@@ -66,64 +66,47 @@ const YoutubeUpload = React.memo(props => {
 
     useEffect(() => {
         if (videoRef && videoRef.current) {
-            console.log('volume -----------', youtubeMute, props.video.videoplay, props.video.volume, props.video.curtime, videoRef.current.internalPlayer.isMuted())
-            // if (videoRef.current.internalPlayer.isMuted())
-            //     videoRef.current.internalPlayer.setVolume(0);
-            // else
+            console.log('volume -----------', youtubeMute, props.video.videoplay, props.video.volume, props.video.curtime)
             videoRef.current.internalPlayer.setVolume(props.video.volume * 100 * (youtubeMute ==='off' ? 1: 0));
         }
     }, [props.video.volume])
 
+    useEffect(() => {
+        if (videoRef && videoRef.current) {
+            console.log('youtubeMute -----------', youtubeMute, props.video.videoplay, props.video.volume, props.video.curtime)
+            videoRef.current.internalPlayer.setVolume(props.video.volume * 100 * (youtubeMute ==='off' ? 1: 0));
+        }
+    }, [youtubeMute])
+
     const handleDragMeForYoutube = (node, pos, scale) => {
-        console.log('drag Youtube---------', realCurTime)
         if (props.onDrag) props.onDrag(node, props.video, props.video.videoplay, realCurTime, userMe);
-    }
-    const handleDragUp = () => {
-        dispatch({
-            type: 'youtube_position',
-            value: {
-                name: props.video.name,
-                videoplay: props.video.videoplay,
-            }
-        });
     }
     const handleClose = (value) => {
         dispatch({type: 'youtube_remove', name: value})
         WebRTC.getInstance().youtubeRemove({name: value})
     }
     const handleYouTubePlay = (event) => {
-        _videoPlay = true
         if (props.onDrag) props.onDrag(dbRef.current.myRef.current, props.video, true, realCurTime, userMe);
     }
     const handleYouTubePause = (event) => {
-        _videoPlay = false
         if (props.onDrag) props.onDrag(dbRef.current.myRef.current, props.video, false, realCurTime, userMe);
     }
     const handleStateChange = (e) => {    
         const currentTime = videoRef.current.internalPlayer.getCurrentTime()
         currentTime.then(function(result) {
-            // setRealCurTime(result)
             realCurTime = result
         })
-        console.log('stateChange: --------', e, props.video.videoplay, _videoPlay)
-        if (props.video.videoplay) {
-            // videoRef.current.internalPlayer.playVideo()
-            return handleYouTubePlay(e)
-        } else {
-            return handleYouTubePause(e)
-            // videoRef.current.internalPlayer.pauseVideo()
-        } 
     }
     const toggleChange = (event)=>{
         if (youtubeMute === 'on') {
             if (videoRef.current) {
-                document.getElementById(youtubeMuteAudio).src = MicMute0
+                document.getElementById(youtubeMuteAudio).src = MicMute1
                 setYoutubeMute('off')
             }
         }
         else {
             if (videoRef.current) {
-                document.getElementById(youtubeMuteAudio).src = MicMute1
+                document.getElementById(youtubeMuteAudio).src = MicMute0
                 setYoutubeMute('on')
             }
         }
@@ -140,7 +123,6 @@ const YoutubeUpload = React.memo(props => {
             initialRect={{ left: props.video.defX, top: props.video.defY, width: props.video.width, height: props.video.height }}
             zIndex={ props.video.id === 'me' ? 10 : 5 }
             onResize={handleDragMeForYoutube}
-            onMouseUp={handleDragUp}
             onMouseMove={handleDragMeForYoutube}
             draggable = { props.video.id === 'me' ? true : false }
             zoom = { props.video.zoom ? props.video.zoom : 1 }
