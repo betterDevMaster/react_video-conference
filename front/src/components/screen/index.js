@@ -25,7 +25,6 @@ const Screen = React.memo(props => {
 
     useEffect(() => {
         if (videoRef && videoRef.current) videoRef.current.volume = props.zoom === 0.5 ? 0 : props.zoom;
-        console.log('screen zoom: ', videoRef.current.volume)
     }, [props.zoom])
 
     const handleDrag = (node, pos, scale) => {
