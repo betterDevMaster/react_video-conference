@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux';
 import DragBox from '../draggable/DragBox'
+import WebRTC from '../../webrtc';
 
 import './index.css';
 
 const Screen = React.memo(props => {
     const dispatch = useDispatch();
+    const videoRef = useRef(null);
 
     useEffect(() => {
         var video = document.getElementById(props.user.stream.id);
@@ -13,10 +15,22 @@ const Screen = React.memo(props => {
         if (video) {
             window.easyrtc.setVideoObjectSrc(video, props.user.stream);
         }
+
+        if (props.user.id === 'me') {
+            props.onGoToFirstPosition(
+                {x: props.sceneZoom ? props.user.defPosX / props.sceneZoom : props.user.defPosX, 
+                    y: props.sceneZoom ? props.user.defPosY / props.sceneZoom : props.user.defPosX})
+        }
     }, []);
 
+    useEffect(() => {
+        if (videoRef && videoRef.current) videoRef.current.volume = props.zoom === 0.5 ? 0 : props.zoom;
+        console.log('screen zoom: ', videoRef.current.volume)
+    }, [props.zoom])
+
     const handleDrag = (node, pos, scale) => {
-        dispatch({ type: 'user_position', value: {id: props.user.id, defPosX: pos.x, defPosY: pos.y, zoom: scale } })
+        WebRTC.getInstance().updateMyPosition({x: pos.x, y: pos.y });
+        dispatch({ type: 'user_position', value: { id: props.user.id, defPosX: pos.x * scale, defPosY: pos.y * scale } });
 
         if (props.onDrag) props.onDrag(node, props.user, pos, scale);
     }
@@ -25,15 +39,19 @@ const Screen = React.memo(props => {
         <DragBox
             type="circle"
             offset={props.pos}
-            scale={props.zoom}
-            initialRect={{ left: props.user.defPosX, top: props.user.defPosY, width: 100, height: 100 }}
+            scale={props.sceneZoom}
+            initialRect={{ 
+                left: props.user.defPosX, 
+                top: props.user.defPosY, 
+                width: 100, 
+                height: 100 }}
             zIndex={props.user.id === 'me' ? 50 : 25}
             onClickSmall={props.onClickSmall}
             onMouseMove={handleDrag}
             tip={props.user.name}
             draggable = {props.user.id === 'me' ? true : false}
             sizable = {false}
-            zoom = {props.user.zoom ? props.user.zoom : 1}
+            zoom = {props.zoom ? props.zoom : 1}
             dragType='body'
         >
             <div key={props.user.id} className='screen'
@@ -44,10 +62,10 @@ const Screen = React.memo(props => {
                 }}
                 tabIndex={0}  >
                 <video
+                    ref={videoRef}
                     className='video'
                     id={props.user.stream.id}
                     controls="" loop="" muted={'me' === props.user.id}
-                    volumn = {props.user.zoom}
                 >
                 </video>
             </div>

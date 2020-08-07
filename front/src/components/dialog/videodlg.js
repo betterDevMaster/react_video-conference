@@ -51,14 +51,16 @@ function VideoDialog(props){
         
         const draggableBack = document.getElementsByClassName('drag-container')[0]
         const posMe = Utils.getPositionFromStyle(draggableBack);
-        const scaleMe = Utils.getValueFromAttr(draggableBack, 'zoom').value;
+        const scaleMe = Utils.getValueFromAttr(draggableBack, 'curzoom').value;
         const calc_def_x = (Math.abs(-posMe.x) + Utils.width() / 2 ) / scaleMe
         const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2 ) / scaleMe
 
-        dispatch({type: 'youtube_add', value:{name: videoId, id: 'me', username: props.uname, value: videoId, width: videoWidth, 
-            height: videoHeight, defX: calc_def_x, defY: calc_def_y, volume: 100, curtime: 0, videoplay: true, isDrag: false}})
-        WebRTC.getInstance().youtubeAdd({videoId: videoId, name: videoId, username: props.uname, width: videoWidth, 
-            height: videoHeight, defX: calc_def_x, defY: calc_def_y, volume: 100, curtime: 0, videoplay: true, isDrag: false})
+        console.log(calc_def_x, calc_def_y, posMe)  
+        dispatch({type: 'youtube_add', value:{name: videoId, id: 'me', username: 'me', value: videoId, width: videoWidth, 
+            height: videoHeight, defX: calc_def_x, defY: calc_def_y, videoplay: true}})
+        WebRTC.getInstance().youtubeAdd({videoId: videoId, name: videoId, username: 'me', width: videoWidth, 
+            height: videoHeight, defX: calc_def_x, defY: calc_def_y, videoplay: true})
+
 
         video.value = ''
         window.$('#videodialog').plainModal('close')

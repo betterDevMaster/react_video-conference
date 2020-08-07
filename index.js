@@ -108,13 +108,12 @@ const YoutubeUpload = React.memo(props => {
         <DragBox
             type="rectangle"
             offset={ props.pos }
-            scale={ props.zoom }
+            scale={ props.sceneZoom }
             initialRect={{ left: props.video.defX, top: props.video.defY, width: props.video.width, height: props.video.height }}
             zIndex={ props.video.id === 'me' ? 10 : 5 }
             onMouseMove={handleYoutubeDrag}
             onResize={handleYoutubeResize}
             draggable = { props.video.id === 'me' }
-            zoom = { props.video.zoom ? props.video.zoom : 1 }
             sizable = { props.video.id === 'me' ? true : false } 
             aspect
         >

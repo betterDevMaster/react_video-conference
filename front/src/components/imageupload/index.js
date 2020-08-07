@@ -28,21 +28,20 @@ const ImageUpload = React.memo((props) => {
         <DragBox
             type="rectangle"
             offset={ props.pos }
-            scale={ props.zoom }
+            scale={ props.sceneZoom }
             initialRect={{ left: props.image.defX, top: props.image.defY, width: props.image.width, height: props.image.height }}
             zIndex={ props.image.id === 'me' ? 10 : 5 }
             onMouseUp={handleImageDrag}
             onResize={handleImageResize}
             draggable = { props.image.id === 'me' ? true : false }
-            zoom = { props.image.zoom ? props.image.zoom : 1 }
             sizable = { props.image.id === 'me' ? true : false } 
+            zoom={1}
             aspect
             dragType='all'
         >
             <div key={props.image.id} className='cus_content'>
                 <div className="cus_header pointer hidden" style={{ zIndex: props.image.id === 'me' ? 10 : 5 }}>
                     <div className="cus_title">Pinned by {props.image.username}</div>
-                    
                 </div>
                 <img src={props.image.value} className="image-frame" alt="map-transparent" />
             </div>

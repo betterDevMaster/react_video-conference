@@ -15,22 +15,23 @@ import img_small from '../images/map-small@2x.0c2a372b.png';
 import img_big from '../images/map-big@2x.44a3f15c.png';
 
 import './index.css';
+import { faMousePointer } from '@fortawesome/free-solid-svg-icons';
 
 function Conference(props) {
-    useEffect(() => {
-        WebRTC.getInstance().startConference(dispatch, null, query.space, query.uname, 2);
-    }, []);
-
     const dispatch = useDispatch();
     const query = qs.parse(props.location.search);
     const users = useSelector((state) => state.users);
     const videos = useSelector((state) => state.screens.videos);
     const images = useSelector((state) => state.screens.images);
     const [userClose, setUserClose] = useState(false);
-
     const [pos, setPos] = useState({ x: 0, y: 0 });
-    const [zoom, setZoom] = useState(1);
+    const [mePos, setMePos] = useState({ x:0, y: 0 });
+    const [sceneZoom, setSceneZoom] = useState(1);
 
+    useEffect(() => {
+        WebRTC.getInstance().startConference(dispatch, null, query.space, query.uname, 2);
+    }, []);
+ 
     const handleSetUserClose = (value) => {
         setUserClose(value);
     };
@@ -38,9 +39,9 @@ function Conference(props) {
     const handleDrag = (dom, pos) => {
         setPos(pos);
     };
-    const handleZoom = (dom, zoom, pos) => {
-        setZoom(zoom);
-        setPos(pos);
+    const handleZoom = (dom, zoom, position) => {
+        setSceneZoom(zoom);
+        setPos(position);
     };
     const handleClickSmall = (smallPos) => {
         const stage = document.getElementById('stage');
@@ -49,21 +50,39 @@ function Conference(props) {
             y: Math.min(0, stage.clientHeight / 2 - smallPos.y)
         });
     };
-    const handleDragMe = (node, me, pos) => {
-        users.forEach((user) => {
-            if (user !== me) {
-                const dist = Math.max(
-                    1,
-                    Math.sqrt((pos.x - user.defPosX) * (pos.x - user.defPosX) + (pos.y - user.defPosY) * (pos.y - user.defPosY))
-                );
-                const scaleVal = Math.max(0.3, Math.min(1, 150 / dist));
-
-                WebRTC.getInstance().updateMyPosition(pos, scaleVal);
-                dispatch({ type: 'user_position', value: { id: user.id, zoom: scaleVal } });
-            } 
-        });
+    const handleGoToFirstPosition = (pos) => {
+        handleClickSmall(pos);
     };
+    const handleDragMe = (node, me, pos, scale) => {
+        setMePos(pos);
+    };
+    const calcZoom = (user) => {
+        if (user.id === 'me' && mePos.x === 0 && mePos.y === 0) {
+            setMePos({ x: user.defPosX, y: user.defPosY });
+        } 
+        if (user.id !== 'me') { 
+            const dist = Math.max(
+                1,
+                Math.sqrt((mePos.x - user.defPosX) * (mePos.x - user.defPosX) + (mePos.y - user.defPosY) * (mePos.y - user.defPosY))
+            );
+            const scaleVal = Math.max(0.5, Math.min(1, 150 / dist));
+            return scaleVal;
+        }
+        return 1;
+    };
+    const calcVolume = (video) => {
+        const dist = getDistanceByRectAndPosition(
+            {
+                left: video.defX - video.width / 2,
+                right: video.defX + video.width / 2,
+                top: video.defY - video.height / 2,
+                bottom: video.defY + video.height / 2
+            }, mePos
+        );
 
+        const volume = dist === 0 ? 1 : Math.max(0, Math.min(1, Math.pow(100 / dist, 4)));
+        return volume < 0.01 ? 0 : volume;
+    }
     const getDistanceByPosition = (p1, p2) => {
         return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
     };
@@ -88,54 +107,6 @@ function Conference(props) {
             )
         );
     };
-
-    const handleDragMeForYoutube = (node, me, videoplay, realCurTime, userMe) => {
-        const videoMe = Utils.getPositionAndSizeFromStyle(node);
-        const dist = getDistanceByRectAndPosition(
-            {
-                left: videoMe.x - videoMe.width / 2,
-                right: videoMe.x + videoMe.width / 2,
-                top: videoMe.y - videoMe.height / 2,
-                bottom: videoMe.y + videoMe.height / 2
-            },
-            {
-                x: userMe.defPosX,
-                y: userMe.defPosY
-            }
-        );
-
-        var vol = dist === 0 ? 1 : Math.max(0, Math.min(1, Math.pow((100 / dist), 4)))
-        if (vol < 0.01) vol = 0
-
-        vol = isFinite(vol) ? vol : 1;
-
-        console.log('handleDrag------', videoplay, vol, realCurTime, userMe)
-
-        WebRTC.getInstance().youtubePosition({
-            name: me.name,
-            width: node.clientWidth,
-            height: node.clientHeight,
-            defX: videoMe.x,
-            defY: videoMe.y,
-            volume: vol,
-            curtime: realCurTime,
-            videoplay: videoplay,
-        });
-        dispatch({
-            type: 'youtube_position',
-            value: {
-                name: me.name,
-                width: node.clientWidth,
-                height: node.clientHeight,
-                defX: videoMe.x,
-                defY: videoMe.y,
-                volume: vol,
-                curtime: realCurTime,
-                videoplay: videoplay,
-            }
-        });
-    };
-
     return (
         <div className="App">
             <div
@@ -155,10 +126,10 @@ function Conference(props) {
                     // debug
                     fitParent
                     background={img_big}
-                    width={3000}
-                    height={2000}
+                    width={WebRTC.getInstance().width}
+                    height={WebRTC.getInstance().height}
                     position={pos}
-                    zoom={zoom}
+                    sceneZoom={sceneZoom}
                     onMove={handleDrag}
                     onZoom={handleZoom}
                     maxZoom={3}
@@ -168,10 +139,12 @@ function Conference(props) {
                         <Screen
                             key={user.id}
                             pos={pos}
-                            zoom={zoom}
+                            sceneZoom={sceneZoom}
+                            zoom={calcZoom(user)}
                             user={user}
                             onClickSmall={handleClickSmall}
                             onDrag={user.id === 'me' ? handleDragMe : null}
+                            onGoToFirstPosition={handleGoToFirstPosition}
                         />
                     ))}
                     {videos.map((video) => (
@@ -179,15 +152,22 @@ function Conference(props) {
                             key={video.name}
                             video={video}
                             pos={pos}
-                            zoom={zoom}
+                            mePos={mePos}
+                            sceneZoom={sceneZoom}
                             userClose={userClose}
                             room={query.space}
-                            onDrag={video.id === 'me' ? handleDragMeForYoutube : null}
-                            // onYoutubeDrag={handleYoutubeDragMe}
+                            volume={calcVolume(video)}
                         />
                     ))}
                     {images.map((image) => (
-                        <ImageUpload key={image.value} image={image} pos={pos} zoom={zoom} userClose={userClose} room={query.space} />
+                        <ImageUpload
+                            key={image.value}
+                            image={image}
+                            pos={pos}
+                            sceneZoom={sceneZoom}
+                            userClose={userClose}
+                            room={query.space}
+                        />
                     ))}
                 </DragContainer>
             </div>

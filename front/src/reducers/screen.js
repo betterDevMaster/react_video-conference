@@ -31,6 +31,16 @@ const screens = (state = {bgMoving:false, videos: [], images: []}, action) => {
                 ...state,
                 videos: moved_videos
             }
+        case "youtube_play":
+            const play_videos = state.videos.map((video) => {
+                if (video.name !== action.value.name)
+                    return video;
+                return {...video, ...action.value}
+            });
+            return {
+                ...state,
+                videos: play_videos
+            }
         case "image_add":
             const new_images = [...state.images, action.value];
             return {
@@ -49,7 +59,6 @@ const screens = (state = {bgMoving:false, videos: [], images: []}, action) => {
             }
         case "image_position":
             const moved_images = state.images.map((image) => {
-                // console.log(image, action, {...image, ...action.value})
                 if (image.name !== action.value.name)
                     return image;
                 return {...image, ...action.value}

@@ -331,8 +331,8 @@
 .youtube-el .mute[data-v-c1f79ed4] {
 	cursor: pointer;
 	position: absolute;
-	left: 10px;
-	bottom: 10px;
+	bottom: 5px;
+    left: 5px;
 	-webkit-filter: drop-shadow(0 0 6px rgba(0,0,0,.4));
 	filter: drop-shadow(0 0 6px rgba(0,0,0,.4));
 	pointer-events: inherit;

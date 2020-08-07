@@ -40,9 +40,6 @@ function Room(props) {
 
         setTimeout(()=>{
             props.history.push('/conference?space='+query.space+'&uname='+userName);
-            // props.history.push('/home/conference');
-            // <Redirect to="/conference/" />
-            // this.context.router.push('child')
         }, 2500);
     }
     

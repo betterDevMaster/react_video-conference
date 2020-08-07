@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {PureComponent} from 'react';
 import './index.css';
 
-export default class DragBox extends React.Component {
+export default class DragBox extends PureComponent {
     constructor(props) {
         super(props);
         this.resizeXRef = React.createRef();
@@ -107,10 +107,10 @@ export default class DragBox extends React.Component {
             x: this.myRef.current.offsetLeft / this.state.scale,
             y: this.myRef.current.offsetTop / this.state.scale
         };
+        if (this.props.onMouseUp) this.props.onMouseUp(this.myRef.current, newPos, this.state.scale);
 
         this.setState({ dragging: false });
 
-        if (this.props.onMouseUp) this.props.onMouseUp(this.myRef.current, newPos, this.state.scale);
 
         e.stopPropagation();
         e.preventDefault();

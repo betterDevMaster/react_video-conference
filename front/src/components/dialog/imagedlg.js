@@ -19,18 +19,18 @@ function ImageDialog(props){
         setImagePreviewUrl(null)
     }
     const handleSubmit = (event) => {
-        console.log('---------', event)
         const imageWidth = parseInt(imgSize.width/3)
         const imageHeight = parseInt(imgSize.height/3)
         
         const draggableBack = document.getElementsByClassName('drag-container')[0]
         const posMe = Utils.getPositionFromStyle(draggableBack);
-        const scaleMe = Utils.getValueFromAttr(draggableBack, 'zoom').value;
+        const scaleMe = Utils.getValueFromAttr(draggableBack, 'curzoom').value;
+
         const calc_def_x = (Math.abs(-posMe.x) + Utils.width() / 2 ) / scaleMe
         const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2 ) / scaleMe
 
-        dispatch({type: 'image_add', value:{name: fileName, id: 'me', username: props.uname, value: imagePreviewUrl, width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y}})
-        WebRTC.getInstance().imageAdd({imageId: imagePreviewUrl, name: fileName, username: props.uname, width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y})
+        dispatch({type: 'image_add', value:{name: fileName, id: 'me', username: 'me', value: imagePreviewUrl, width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y}})
+        WebRTC.getInstance().imageAdd({imageId: imagePreviewUrl, name: fileName, username: 'me', width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y})
 
         setImagePreviewUrl(null)
         window.$('#imagedialog').plainModal('close')
@@ -42,7 +42,6 @@ function ImageDialog(props){
             var img = new Image;
             img.onload = function() {
                 setImgSize({width: img.width, height: img.height})
-                console.log("The width of the image is " + img.width + "px.");
             };
             img.src = reader.result;
         }

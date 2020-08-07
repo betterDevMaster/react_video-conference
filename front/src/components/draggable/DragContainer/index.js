@@ -10,7 +10,7 @@ export default class DragContainer extends React.Component {
         pos: { x: 0, y: 0 },
         dragging: false,
         rel: null, // position relative to the cursor
-        zoom: 1
+        sceneZoom: 1
     };
     // we could get away with not having this (and just having the listeners on
     // our div), but then the experience would be possibly be janky. If there's
@@ -56,7 +56,7 @@ export default class DragContainer extends React.Component {
             y: e.pageY - this.state.rel.y
         };
         if (this.props.onMove) {
-            this.props.onMove(this.myRef.current, DragContainer.positionToParent(this.props, this.props.zoom, newPos));
+            this.props.onMove(this.myRef.current, DragContainer.positionToParent(this.props, this.props.sceneZoom, newPos));
         }
         e.stopPropagation();
         e.preventDefault();
@@ -68,16 +68,16 @@ export default class DragContainer extends React.Component {
         // console.log(cursor_x, cursor_y);
         var newZoom = Math.min(
             this.props.maxZoom ? this.props.maxZoom : 3,
-            Math.max(this.props.minZoom ? this.props.minZoom : 0.5, this.state.zoom + (ev.deltaY < 0 ? 0.1 : -0.1))
+            Math.max(this.props.minZoom ? this.props.minZoom : 0.5, this.state.sceneZoom + (ev.deltaY < 0 ? 0.1 : -0.1))
         );
         newZoom = DragContainer.zoomToParent(this.props, newZoom);
         const newPos = {
             x: this.myRef.current.offsetLeft,
             y: this.myRef.current.offsetTop
         };
-        newPos.x = newPos.x - ((cursor_x - newPos.x) * (newZoom - this.state.zoom)) / this.state.zoom;
-        newPos.y = newPos.y - ((cursor_y - newPos.y) * (newZoom - this.state.zoom)) / this.state.zoom;
-
+        newPos.x = newPos.x - ((cursor_x - newPos.x) * (newZoom - this.state.sceneZoom)) / this.state.sceneZoom;
+        newPos.y = newPos.y - ((cursor_y - newPos.y) * (newZoom - this.state.sceneZoom)) / this.state.sceneZoom;
+        
         if (this.props.onZoom) {
             this.props.onZoom(this.myRef.current, newZoom, DragContainer.positionToParent(this.props, newZoom, newPos));
         }
@@ -102,8 +102,8 @@ export default class DragContainer extends React.Component {
     };
     static getDerivedStateFromProps(props, state) {
         return {
-            pos: DragContainer.positionToParent(props, props.zoom, props.position),
-            zoom: DragContainer.zoomToParent(props, props.zoom)
+            pos: DragContainer.positionToParent(props, props.sceneZoom, props.position),
+            sceneZoom: DragContainer.zoomToParent(props, props.sceneZoom)
         };
     }
     render() {
@@ -120,11 +120,11 @@ export default class DragContainer extends React.Component {
                     top: this.state.pos.y + 'px',
                     background: `url(${this.props.background})`,
                     backgroundSize: 'cover',
-                    width: this.props.width * this.state.zoom,
-                    height: this.props.height * this.state.zoom,
+                    width: this.props.width * this.state.sceneZoom,
+                    height: this.props.height * this.state.sceneZoom,
                     // transform: `scale(${this.state.zoom})`,
                 }}
-                zoom={this.state.zoom}
+                curzoom={this.state.sceneZoom}
             >
                 {this.props.children}
             </div>
