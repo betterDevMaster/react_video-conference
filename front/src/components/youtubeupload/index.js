@@ -23,8 +23,8 @@ const YoutubeUpload = React.memo((props) => {
     const opts = {
         playerVars: {
             autoplay: 1,
-            // origin: 'https://webrtc.bcisummit.com',
-            origin: 'http://localhost:3000/conference',
+            origin: 'https://webrtc.bcisummit.com',
+            // origin: 'http://localhost:3000/conference',
             enablejsapi: 1,
             loop: 1,
             autohide: 1,
