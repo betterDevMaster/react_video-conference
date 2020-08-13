@@ -185,6 +185,8 @@ var VTCClient = function(myId, roomName, onErrorFn) {
      * @public
      */
     this.setVideoObjectSrc = function(videoSel, stream) {
+        // console.log('VTC setVideoObjectSrc: ----------- ', element, stream)
+        
         easyrtc.setVideoObjectSrc(videoSel.get(0), stream);
     };
 

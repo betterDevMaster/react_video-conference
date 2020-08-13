@@ -7764,6 +7764,7 @@
          *
          */
         this.setVideoObjectSrc = function(element, stream) {
+            // console.log('EasyRTC setVideoObjectSrc: ----------- ', element, stream)
             if (stream && stream !== "") {
                 // element.autoplay = true;
                 if (typeof element.srcObject !== 'undefined') {

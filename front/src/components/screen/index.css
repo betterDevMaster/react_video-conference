@@ -12,6 +12,16 @@
     width: 100%;
     height: 100%;
 }
+.screenshare {
+    border: 1px solid;
+    border-radius: 0;
+    object-fit: cover;
+    position: absolute;
+    transform-origin: 50% 50%;
+    width: 100%;
+    height: 100%;
+    /* display: none; */
+}
 .videoStatus {
     position: relative;
     height: 25px;

@@ -32,6 +32,7 @@ const   Navbar = React.memo(props => {
 
     const toggleChange = (type1, value1)=>{
         dispatch( {type: type1, value: value1 ==='on'?'off':'on'});
+        // console.log('toogleChange: ', type1, value1)
         if(type1 === 'click_camera'){
             dispatch({type:'user_media', value: { id: 'me', type: 'camera', status: value1 ==='on'?'off':'on'}})
             WebRTC.getInstance().toggleCamera(value1==='off')
@@ -39,7 +40,7 @@ const   Navbar = React.memo(props => {
             dispatch({type:'user_media', value: { id: 'me', type: 'mic', status: value1 ==='on'?'off':'on'}})
             WebRTC.getInstance().toggleMic(value1==='off')
         } else if ( type1 === 'click_screenshare') {
-            if(!document.getElementById('screen_me')) return;
+            // if(!document.getElementById('screen_me')) return;
             dispatch({type:'user_media', value: { id: 'me', type: 'screenshare', status: value1 ==='on'?'off':'on'}})
             WebRTC.getInstance().toggleScreenShare(value1==='off')
         }
