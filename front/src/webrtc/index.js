@@ -1,3 +1,5 @@
+import { faWindowRestore } from "@fortawesome/free-solid-svg-icons";
+
 class WebRTC {
     static _instance = null;
     client = null;
@@ -10,9 +12,11 @@ class WebRTC {
     enableScreenShare = true;
     enableCamera = true;
     enableMic = true;
+    screenStream = {};
+    screenShareStream = {};
     width = 3000;
     height = 2000;
-
+    
     videoQualities = [
         { text: 'SSM (30p - 128Kb/s)', value: { width: 160, height: 120, frameRate: 10 } },
         { text: 'SM (120p - 256Kb/s)', value: { width: 320, height: 240, frameRate: 10 } },
@@ -239,6 +243,7 @@ class WebRTC {
     //     }
     //     this.closeClient()
     // }
+
     updateStreamMode() {
         // get getUserMedia mode
         let mode = { video: false, audio: false };
@@ -257,7 +262,8 @@ class WebRTC {
         }
         this.currentContraintMode = mode;
     }
-    onStreamConfigurationChange(peerId) {
+
+    onStreamConfigurationChange() {
         if (!this.enableScreenShare) {
             //now screen sharing status...
             const peers = window.easyrtc.getPeerConnections();
@@ -312,7 +318,7 @@ class WebRTC {
             // console.log('onStreamConfiguration: ', stream, local)
 
             const video_me = document.getElementById(local.id);
-            
+
             // console.log('video_me ----------', video_me)
             if (video_me) window.easyrtc.setVideoObjectSrc(video_me, stream);
 
@@ -338,6 +344,7 @@ class WebRTC {
             }
         });
     }
+
     async updateDevices() {
         try {
             let audio = [];
@@ -360,8 +367,8 @@ class WebRTC {
         } catch (e) {}
     }
 
-    async startConference(dispatch, token, room, userName, defScale) {
-        console.log('start conference: ', userName, defScale);
+    async startConference(dispatch, token, room, userName) {
+        console.log('start conference: ', room, userName);
         this.userName = userName;
         this.roomName = room ? room : window.localStorage.getItem('r');
 
@@ -394,6 +401,35 @@ class WebRTC {
                     dispatch({
                         type: 'chat_add',
                         value: { username: client.idToName(peerId), userid: peerId, text: content, align: 'left', time: Date.now() }
+                    });
+                } else if (msgType === 'user_add') {
+                    // const stream = window.easyrtc.getScreenShareStream()
+                    // stream.id = content.streamId
+                    const screenshare_id = 'screenshare_' + WebRTC.getInstance().getUserName()
+
+                    // const screenShareStream = window.easyrtc.getLocalStream(screenshare_id)
+                    // window.easyrtc.register3rdPartyLocalMediaStream(stream, screenshare_id)
+                    setTimeout(() => {
+                        const localstream = window.easyrtc.getLocalStream(screenshare_id)
+                        console.log(' peermessage content : -----------', content, screenshare_id, localstream);
+                    }, 1500);
+
+                    dispatch({
+                        type: 'user_add',
+                        value: {
+                            id: content.id,
+                            name: content.name,
+                            stream: WebRTC.getInstance().screenShareStream,
+                            defPosX: content.defPosX,
+                            defPosY: content.defPosY
+                        }
+                    });
+                } else if (msgType === 'user_remove') {
+                    dispatch({
+                        type: 'user_remove',
+                        value: {
+                            id: content.id,
+                        }
                     });
                 } else if (msgType === 'set_peer_position') {
                     WebRTC.getInstance().updatePeerPosition(content);
@@ -525,12 +561,12 @@ class WebRTC {
                     'get_peer_position',
                     peerId,
                     function (msgType, position) {
-                        console.log('onStreamAccept: ', peerName, 'roomName = ', WebRTC.getInstance().roomName);
+                        console.log('onStreamAccept: ', peerName, WebRTC.getInstance().roomName, client.getId(), stream);
                         dispatch({
                             type: 'user_add',
                             value: { id: peerId, name: peerName, stream, defPosX: position.x, defPosY: position.y }
                         });
-                        WebRTC.getInstance().onStreamConfigurationChange(peerId);
+                        WebRTC.getInstance().onStreamConfigurationChange();
                     },
                     function (errorCode, errorText) {}
                 );
@@ -560,8 +596,8 @@ class WebRTC {
                 return;
             })
             .connect(userName, this.roomName, (client) => {
-                console.log('start local stream: ', userName, 'roomName = ', this.roomName);
                 var stream = client.getLocalStream();
+                console.log('start local stream: ', userName, this.roomName, client.getId(), stream);
 
                 window.easyrtc.sendServerMessage(
                     'get_my_position',
@@ -596,54 +632,91 @@ class WebRTC {
         this.updateStreamMode();
         const local = window.easyrtc.getLocalStream();
         var _this = this;
-        // navigator.mediaDevices.getUserMedia(this.currentContraintMode).then(
+
+        console.log('WebRTC local stream : ', local)
+
         navigator.mediaDevices
             .getDisplayMedia({ video: { width: 1920, height: 1080, frameRate: 5 } })
             .then(async (stream) => {
-                const video_screenshare_me = document.getElementById('screenshare_' + local.id);
-                
-                if (video_screenshare_me) {
-                    video_screenshare_me.style.display = 'block'
-                    window.easyrtc.setVideoObjectSrc(video_screenshare_me, stream);
-                }
+                // console.log('WebRTC mediaStream : ', stream);
+                const screenshare_id = 'screenshare_' + WebRTC.getInstance().getUserName()
 
-                console.log('onSetScreenCapture : ')
+                window.easyrtc.register3rdPartyLocalMediaStream(stream, screenshare_id)
+                WebRTC.getInstance().screenShareStream = window.easyrtc.getLocalStream(screenshare_id)
 
-                stream.getVideoTracks()[0].onended = () => {
+                console.log('WebRTC onSetScreenCapture stream : ----------', screenshare_id, WebRTC.getInstance().screenShareStream)
+
+                WebRTC.getInstance().screenShareStream.getVideoTracks()[0].onended = () => {
                     this.toggleScreenShare(true);
                     this.dispatch({ type: 'click_screenshare', value: 'on' });
                     this.dispatch({ type: 'user_media', value: { id: 'me', type: 'screenshare', status: 'on' } });
                     document.getElementById('screenshare').src = '/static/media/screenshare-on.44d81ce8.svg';
-                    video_screenshare_me.style.display = 'none'
+                    this.dispatch({ type: 'user_remove', value: { id: 'screenshare_' + WebRTC.getInstance().getUserName() } });
+                    // this.client.sendPeerMessage({ room: this.roomName }, 'user_remove', {
+                    //     id: 'screenshare_' + WebRTC.getInstance().getUserName(),
+                    // });
+                    // video_screenshare_me.style.display = 'none'
                 };
 
                 // local.getTracks().forEach((track) => {
                 //     track.stop();
                 // });
 
-                const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                stream.addTrack(audioStream.getAudioTracks()[0]);
-                // replace local stream
-                stream.getTracks().forEach((track) => {
-                    local.addTrack(track);
-                });
+                // const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // stream.addTrack(audioStream.getAudioTracks()[0]);
+                // // replace local stream
+                // stream.getTracks().forEach((track) => {
+                //     local.addTrack(track);
+                // });
                 WebRTC.getInstance().screenStream = stream;
+
+                this.dispatch({
+                    type: 'user_add',
+                    value: {
+                        id: screenshare_id,
+                        name: 'ScreenShare' + WebRTC.getInstance().getUserName(),
+                        stream: WebRTC.getInstance().screenShareStream,
+                        defPosX: WebRTC.getInstance().myPosition.x,
+                        defPosY: WebRTC.getInstance().myPosition.y
+                    }
+                });
+
+                this.client.sendPeerMessage({ room: this.roomName }, 'user_add', {
+                    id: screenshare_id,
+                    name: 'ScreenShare' + WebRTC.getInstance().getUserName(),
+                    // streamId: stream.id,
+                    stream: WebRTC.getInstance().screenShareStream,
+                    defPosX: WebRTC.getInstance().myPosition.x,
+                    defPosY: WebRTC.getInstance().myPosition.y
+                });
                 
-                // const video_me = document.getElementById(local.id);
-                // window.easyrtc.setVideoObjectSrc(video_screenshare_me, stream);
-                // send it to remote
-                const peers = window.easyrtc.getPeerConnections();
-                for (const id in peers) {
-                    const peer = peers[id];
-                    if (peer.cancelled) continue;
-                    peer.pc.getSenders().map((sender) =>
-                        sender.replaceTrack(
-                            stream.getTracks().find((track) => {
-                                return track.kind === sender.track.kind;
-                            })
-                        )
-                    );
-                }
+                WebRTC.getInstance().onStreamConfigurationChange();
+                // // const content = {
+                // //     id: 'screenshare_' + WebRTC.getInstance().getUserName(),
+                // //     name: 'ScreenShare' + WebRTC.getInstance().getUserName(),
+                // //     stream,
+                // //     defPosX: WebRTC.getInstance().myPosition.x,
+                // //     defPosY: WebRTC.getInstance().myPosition.y
+                // // }
+                
+                // // window.easyrtc.sendServerMessage("set_peer_stream", content)
+
+                // const screenshare_me = document.getElementById(stream.id);
+                // window.easyrtc.setVideoObjectSrc(screenshare_me, stream);
+                // // send it to remote
+                // const peers = window.easyrtc.getPeerConnections();
+                // console.log('WebRTC peers : ', peers)
+                // for (const id in peers) {
+                //     const peer = peers[id];
+                //     if (peer.cancelled) continue;
+                //     peer.pc.getSenders().map((sender) =>
+                //         sender.replaceTrack(
+                //             stream.getTracks().find((track) => {
+                //                 return track.kind === sender.track.kind;
+                //             })
+                //         )
+                //     );
+                // }
             })
             .catch(function (err) {
                 //log to console first
@@ -664,6 +737,10 @@ class WebRTC {
                     _this.dispatch({ type: 'click_screenshare', value: 'on' });
                     _this.dispatch({ type: 'user_media', value: { id: 'me', type: 'screenshare', status: 'on' } });
                     document.getElementById('screenshare').src = '/static/media/screenshare-on.44d81ce8.svg';
+                    _this.dispatch({ type: 'user_remove', value: { id: 'screenshare_' + WebRTC.getInstance().getUserName() } });
+                    this.client.sendPeerMessage({ room: this.roomName }, 'user_remove', {
+                        id: 'screenshare_' + WebRTC.getInstance().getUserName(),
+                    });
                 } else if (err.name === 'TypeError' || err.name === 'TypeError') {
                     //empty constraints object
                     console.log('TypeError');

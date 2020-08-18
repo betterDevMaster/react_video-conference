@@ -2,7 +2,7 @@ exports.PORT = process.env.PORT || 3306
 
 exports.CLIENT_ORIGIN = process.env.NODE_ENV === 'production'
   ? 'https://webrtc.bcisummit.com'
-  : 'https://webrtc.bcisummit.com'
+  : 'https://localhost:3111'
 
 exports.DB_URL = process.env.NODE_ENV === 'production'
   ? process.env.DB_URL

@@ -3422,6 +3422,7 @@
                 };
 
                 RTCPeerConnection.prototype.getLocalStreams = function() {
+                    // console.log('RTCPeerConnection getLocalStreams : ', this.localStreams)
                     return this.localStreams;
                 };
 
@@ -5815,6 +5816,7 @@
             }
         }
 
+        this.screenShareStream = {}
         /**
          * Sets functions which filter sdp records before calling setLocalDescription or setRemoteDescription.
          * This is advanced functionality which can break things, easily. See the easyrtc_rates.js file for a
@@ -6737,8 +6739,8 @@
         /** @private */
         var dataEnabled = false;
         /** @private */
-        var serverPath = 'https://webrtc.bcisummit.com/'; // this was null, but that was generating an error.
-        // var serverPath = 'http://localhost:3011/'; // this is the tesing port.
+        // var serverPath = 'https://webrtc.bcisummit.com/'; // this was null, but that was generating an error.
+        var serverPath = 'http://localhost:3111/'; // this is the tesing port.
         /** @private */
         var roomOccupantListener = null;
         /** @private */
@@ -6824,6 +6826,7 @@
             return null;
         };
         this.getPeerConnections = function() {
+            // console.log('EasyRTC getPeerConnections : ', peerConns)
             return peerConns;
         };
 
@@ -7463,6 +7466,7 @@
             if (!streamName) {
                 streamName = "default";
             }
+            console.log('EasyRTC : getLocalMediaStreamByName : -----------', streamName, namedLocalMediaStreams[streamName])
             if (namedLocalMediaStreams.hasOwnProperty(streamName)) {
                 return namedLocalMediaStreams[streamName];
             } else {
@@ -7515,6 +7519,7 @@
          * must be done by the supplying party.
          */
         this.register3rdPartyLocalMediaStream = function(stream, streamName) {
+            console.log('EasyRTC : register3rdPartyLocalMediaStream ------', stream, streamName)
             return registerLocalMediaStreamByName(stream, streamName);
         };
 
@@ -7721,6 +7726,7 @@
          *    easyrtc.setVideoObjectSrc( document.getElementById("myVideo"), easyrtc.getLocalStream());
          */
         this.getLocalStream = function(streamName) {
+            console.log('EasyRTC : ---------', streamName)
             return getLocalMediaStreamByName(streamName) || null;
         };
 
@@ -8897,10 +8903,12 @@
             if (!destination) {
                 self.showError(self.errCodes.DEVELOPER_ERR, "destination was null in sendPeerMessage");
             }
-
+            // console.log('easyRtc sendPeerMessage: ---------- ', msgType, msgData)
             logDebug("sending peer message " + JSON.stringify(msgData));
 
             function ackHandler(response) {
+                // console.log('easyRtc sendPeerMessage response: ---------- ', response)
+
                 if (response.msgType === "error") {
                     if (failureCB) {
                         failureCB(response.msgData.errorCode, response.msgData.errorText);

@@ -27,9 +27,11 @@ function Conference(props) {
     const [pos, setPos] = useState({ x: 0, y: 0 });
     const [mePos, setMePos] = useState({ x:0, y: 0 });
     const [sceneZoom, setSceneZoom] = useState(1);
+    const screenShareId = 'screenshare_' + WebRTC.getInstance().getUserName()
 
+    // console.log('Conference : users : ', users)
     useEffect(() => {
-        WebRTC.getInstance().startConference(dispatch, null, query.space, query.uname, 2);
+        WebRTC.getInstance().startConference(dispatch, null, query.space, query.uname);
     }, []);
  
     const handleSetUserClose = (value) => {
@@ -57,10 +59,10 @@ function Conference(props) {
         setMePos(pos);
     };
     const calcZoom = (user) => {
-        if (user.id === 'me' && mePos.x === 0 && mePos.y === 0) {
+        if ((user.id === 'me' || user.id === screenShareId) && mePos.x === 0 && mePos.y === 0) {
             setMePos({ x: user.defPosX, y: user.defPosY });
         } 
-        if (user.id !== 'me') { 
+        if (user.id !== 'me' && user.id !== screenShareId) { 
             const dist = Math.max(
                 1,
                 Math.sqrt((mePos.x - user.defPosX) * (mePos.x - user.defPosX) + (mePos.y - user.defPosY) * (mePos.y - user.defPosY))

@@ -1,6 +1,7 @@
 const users = (state = [], action) => {
     switch (action.type) {
         case "user_add":
+            // console.log('reducer user_add : ', state, action)
             if (state.find((user) => user.id === action.value.id)) {
                 console.log('Duplicate user error!', action.value)
                 return state;

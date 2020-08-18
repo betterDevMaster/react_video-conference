@@ -120,6 +120,7 @@ var VTCClient = function(myId, roomName, onErrorFn) {
      * @public
      */
     this.sendPeerMessage = function(dest, msgType, msgData, successFn) {
+        // console.log('VTC sendPeerMessage : --------- ', dest, msgType, msgData, successFn)
         var target = {};
         if (typeof dest !== 'object' ||
             (typeof dest.rtcId !== 'string' && typeof dest.room !== 'string')) {
@@ -305,6 +306,7 @@ var VTCCore = {
      */
     onPeerMessage: function(peerMessageFn) {
         var _this = this;
+        // console.log('VTC onPeerMessage : ', this, peerMessageFn)
         easyrtc.setPeerListener(function(peerId, msgType, content) {
             peerMessageFn(_this.client, peerId, msgType, content);
         });
@@ -325,7 +327,10 @@ var VTCCore = {
      */
     onStreamAccept: function(streamAcceptFn) {
         var _this = this;
+        // console.log('VTC onStreamAccept : --------------', this)
         easyrtc.setStreamAcceptor(function(peerId, stream) {
+            // console.log('VTC onStreamAccept setStreamAcceptor : --------------', _this, peerId, stream)
+            
             streamAcceptFn(_this.client, peerId, stream);
         });
 
@@ -384,6 +389,7 @@ var VTCCore = {
      * @public
      */
     connect: function(userName, roomName, successFn) {
+        // console.log('VTC connect : ', userName, roomName, successFn)
         if (!this._validateConfig()) {
             ErrorMetric.log('VTCCore.connect => config changed somehow...');
             ErrorMetric.log('                => ' + JSON.stringify(this.config));
@@ -444,6 +450,7 @@ var VTCCore = {
         });
 
         easyrtc.initMediaSource(function() {
+            // console.log('Vtc initMediaSource : -------------')
             easyrtc.connect('video-conference', function(myId) {
                 easyrtc.joinRoom(roomName, null, function(roomName) {
                     _this.client = new VTCClient(myId, roomName, _this._errorFn);

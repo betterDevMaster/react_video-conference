@@ -77,8 +77,8 @@ app.use('*', (req, res) => {
 
 // By default the listening server port is 8080 unless set by nconf or Heroku
 
-// var serverPort = 3011; // testing for the localhost
-var serverPort = 3000;  // for the product port
+var serverPort = 3111; // testing for the localhost
+// var serverPort = 3000;  // for the product port
 
 webServer = require('http').createServer(app).listen(serverPort);
 console.log("Http server is running on Port: " + serverPort)
@@ -110,6 +110,7 @@ easyrtc.setOption('appIceServers', [
 easyrtc.listen(app, socketServer);
 
 var peerPositions = []
+var peerStreams = []
 
 const calcualteMyPosition = (peerId, width, height, socketId)=>{
   if(peerPositions.length === 0){
@@ -143,7 +144,7 @@ const calcualteMyPosition = (peerId, width, height, socketId)=>{
                 }
   peerPositions.push(retPos)
 
-  console.log('position: before: ', peerPositions, peerPositions.length, peerPositions[peerPositions.length-1], '-------------------')
+  // console.log('position: before: ', peerPositions, peerPositions.length, peerPositions[peerPositions.length-1], '-------------------')
 
   peerPositions = peerPositions.filter((c, index) => {
     return peerPositions.indexOf(c) === index;
@@ -179,8 +180,13 @@ easyrtc.events.on("easyrtcMsg", function(connectionObj, message, callback, next)
       peerPositions = peerPositions.filter((c, peerId) => {
         return peerPositions.indexOf(c) === peerId;
       });
-      console.log({msgType:'set_peer_position', peerPositions, message})
+      return true;
+    case 'set_peer_stream':
+      console.log('set_peer_stream : ', message.msgData)
+      peerStreams.push(message.msgData)
+      return true
   }
+
   connectionObj.events.emitDefault("easyrtcMsg", connectionObj, message, callback, next);
 });
 easyrtc.events.on("roomLeave", function(connectionObj, roomName, callback){
