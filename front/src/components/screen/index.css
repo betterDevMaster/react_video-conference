@@ -13,7 +13,6 @@
     height: 100%;
 }
 .screenshare {
-    border: 1px solid;
     border-radius: 0;
     object-fit: cover;
     position: absolute;

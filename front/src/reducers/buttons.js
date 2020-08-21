@@ -1,4 +1,4 @@
-const buttons = (state = {chat:'on', camera:'on', fullscreen:'on', mic: 'on', screenshare: 'on'}, action) => {
+const buttons = (state = {chat:'on', camera:'on', fullscreen:'on', mic: 'on', screenshare: 'off'}, action) => {
     switch(action.type){
         case "click_chat":
             return {

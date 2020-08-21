@@ -7,6 +7,7 @@ const easyrtc = require('open-easyrtc');
 const fs = require('fs');
 const Handlebars = require('handlebars');
 const io = require('socket.io');
+const RTCMultiConnectionServer = require('rtcmulticonnection-server');
 
 const app = express()
 const emailController = require('./email/email.controller')
@@ -77,8 +78,8 @@ app.use('*', (req, res) => {
 
 // By default the listening server port is 8080 unless set by nconf or Heroku
 
-var serverPort = 3111; // testing for the localhost
-// var serverPort = 3000;  // for the product port
+// var serverPort = 3111; // testing for the localhost
+var serverPort = 3000;  // for the product port
 
 webServer = require('http').createServer(app).listen(serverPort);
 console.log("Http server is running on Port: " + serverPort)
@@ -193,3 +194,28 @@ easyrtc.events.on("roomLeave", function(connectionObj, roomName, callback){
   peerPositions = peerPositions.filter((peer)=>peer.socketId !== connectionObj.socket.id)
   connectionObj.events.emitDefault("roomLeave", connectionObj, roomName, callback);
 });
+
+
+// var RTC_PORT = 3222
+// var httpApp;
+
+// httpApp = require('http').createServer(app).listen(process.env.PORT || RTC_PORT, process.env.IP || "0.0.0.0");
+// console.log("Http server is running on Port: " + RTC_PORT)
+
+// io(httpApp).on('connection', function(socket) {
+//   RTCMultiConnectionServer.addSocket(socket);
+
+//   // ----------------------
+//   // below code is optional
+
+//   const params = socket.handshake.query;
+//   console.log('-----------------socket server : ', params)
+
+//   if (!params.socketCustomEvent) {
+//       params.socketCustomEvent = 'custom-message';
+//   }
+
+//   socket.on(params.socketCustomEvent, function(message) {
+//       socket.broadcast.emit(params.socketCustomEvent, message);
+//   });
+// });

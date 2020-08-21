@@ -9,7 +9,7 @@ import Screen from '../components/screen';
 import YoutubeUpload from '../components/youtubeupload';
 import ImageUpload from '../components/imageupload';
 import DragContainer from '../components/draggable/DragContainer';
-import Utils from '../utils/position';
+import ScreenShare from '../components/screenshare';
 
 import img_small from '../images/map-small@2x.0c2a372b.png';
 import img_big from '../images/map-big@2x.44a3f15c.png';
@@ -23,13 +23,13 @@ function Conference(props) {
     const users = useSelector((state) => state.users);
     const videos = useSelector((state) => state.screens.videos);
     const images = useSelector((state) => state.screens.images);
+    const screenshares = useSelector((state) => state.screens.screenshares);
     const [userClose, setUserClose] = useState(false);
     const [pos, setPos] = useState({ x: 0, y: 0 });
     const [mePos, setMePos] = useState({ x:0, y: 0 });
     const [sceneZoom, setSceneZoom] = useState(1);
-    const screenShareId = 'screenshare_' + WebRTC.getInstance().getUserName()
 
-    // console.log('Conference : users : ', users)
+    // console.log('Conference : screenshare: ------------- ', screenshares)
     useEffect(() => {
         WebRTC.getInstance().startConference(dispatch, null, query.space, query.uname);
     }, []);
@@ -37,7 +37,6 @@ function Conference(props) {
     const handleSetUserClose = (value) => {
         setUserClose(value);
     };
-
     const handleDrag = (dom, pos) => {
         setPos(pos);
     };
@@ -59,10 +58,10 @@ function Conference(props) {
         setMePos(pos);
     };
     const calcZoom = (user) => {
-        if ((user.id === 'me' || user.id === screenShareId) && mePos.x === 0 && mePos.y === 0) {
+        if (user.id === 'me' && mePos.x === 0 && mePos.y === 0) {
             setMePos({ x: user.defPosX, y: user.defPosY });
         } 
-        if (user.id !== 'me' && user.id !== screenShareId) { 
+        if (user.id !== 'me') { 
             const dist = Math.max(
                 1,
                 Math.sqrt((mePos.x - user.defPosX) * (mePos.x - user.defPosX) + (mePos.y - user.defPosY) * (mePos.y - user.defPosY))
@@ -168,6 +167,15 @@ function Conference(props) {
                             pos={pos}
                             sceneZoom={sceneZoom}
                             userClose={userClose}
+                            room={query.space}
+                        />
+                    ))}
+                    {screenshares.map((screenshare) => (
+                        <ScreenShare
+                            key={screenshare.name}
+                            screenshare={screenshare}
+                            pos={pos}
+                            sceneZoom={sceneZoom}
                             room={query.space}
                         />
                     ))}

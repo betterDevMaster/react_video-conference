@@ -8,7 +8,7 @@ const users = (state = [], action) => {
             }
             return [
                 ...state,
-                { ...action.value, media: { mic: 'on', camera: 'on' } }
+                { ...action.value, media: { mic: 'on', camera: 'on', screenshare: 'off' } }
             ]
         case "user_remove":
             return state.filter((user) => user.id !== action.value.id);
@@ -20,7 +20,8 @@ const users = (state = [], action) => {
                     return { ...user, media: { ...user.media, mic: action.value.status } }
                 if (action.value.type === 'camera')
                     return { ...user, media: { ...user.media, camera: action.value.status } }
-                return { ...user, media: { ...user.media, screenshare: action.value.status } }
+                // if (action.value.type === 'screenshare')
+                //     return { ...user, media: { ...user.media, screenshare: action.value.status } }
             });
         case "user_position":
             return state.map((user) => {

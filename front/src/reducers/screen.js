@@ -1,4 +1,4 @@
-const screens = (state = {bgMoving:false, videos: [], images: []}, action) => {
+const screens = (state = {bgMoving:false, videos: [], images: [], screenshares: [], peer: {}}, action) => {
     switch(action.type){
         case "backgound_moving":
             return {
@@ -67,6 +67,50 @@ const screens = (state = {bgMoving:false, videos: [], images: []}, action) => {
                 ...state,
                 images: moved_images
             }
+        case "set_peer":
+            // console.log('reducer setPeer : ------- ', state, action, { 
+            //     ...state,
+            //     peer: action.value
+            // })
+            return { 
+                ...state,
+                peer: action.value
+            }
+        case "screenshare_add":
+            return { 
+                ...state,
+                screenshares: [...state.screenshares, action.value]
+            }
+        case "screenshare_change":
+            const changed_screenshares = state.screenshares.map((screenshare) => {
+                if (screenshare.userid !== action.value.userid)
+                    return screenshare;
+                return {...screenshare, ...action.value}
+            });
+            return {
+                ...state,
+                screenshares: changed_screenshares
+            }
+        case "screenshare_position":
+            const moved_screenshares = state.screenshares.map((screenshare) => {
+                if (screenshare.name !== action.value.name)
+                    return screenshare;
+                return {...screenshare, ...action.value}
+            });
+            return {
+                ...state,
+                screenshares: moved_screenshares
+            }
+        case "screenshare_remove":
+            const remove_screenshares = state.screenshares.filter(x => x.name!==action.name);
+            return {
+                ...state,
+                screenshares: remove_screenshares
+            }
+        case "screenshare_remove_by_id":
+            return { ...state, screenshares: state.screenshares.filter((screenshare)=>{
+                return screenshare.userid !== action.peerId;
+            })}
         default:
             return state;
     }

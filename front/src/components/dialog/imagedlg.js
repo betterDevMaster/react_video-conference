@@ -29,8 +29,8 @@ function ImageDialog(props){
         const calc_def_x = (Math.abs(-posMe.x) + Utils.width() / 2 ) / scaleMe
         const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2 ) / scaleMe
 
-        dispatch({type: 'image_add', value:{name: fileName, id: 'me', username: 'me', value: imagePreviewUrl, width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y}})
-        WebRTC.getInstance().imageAdd({imageId: imagePreviewUrl, name: fileName, username: 'me', width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y})
+        dispatch({type: 'image_add', value:{name: fileName, id: 'me', username: 'Me', value: imagePreviewUrl, width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y}})
+        WebRTC.getInstance().imageAdd({imageId: imagePreviewUrl, name: fileName, width: imageWidth, height: imageHeight, defX: calc_def_x, defY: calc_def_y})
 
         setImagePreviewUrl(null)
         window.$('#imagedialog').plainModal('close')
