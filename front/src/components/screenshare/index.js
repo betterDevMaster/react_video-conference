@@ -93,47 +93,48 @@ const ScreenShare = React.memo((props) => {
                     });
             } else {
                 // console.log('watch session : -------------', props.screenshare, props.screenshare.name)
-
-                const conn = self.peer.connect(props.screenshare.name);
-                conn.on('open', () => {
-                    // console.log('watch open : --------- ', self.peer, self.id)
-                    if (self.peer) {
-                        conn.send(self.id);
-                    }
-                });
-
-                self.peer &&
-                    self.peer.on('call', (call) => {
-                        // console.log('call : --------- ', call)
-
-                        call.answer();
-
-                        call.on('stream', (incoming) => {
-                            // console.log('stream : ------------', incoming);
-                            if (videoShareRef.current !== null) {
-                                videoShareRef.current.srcObject = incoming;
-                                if (incoming.active) {
-                                    videoShareRef.current.play();
-                                    incoming.getTracks().forEach((track) => {
-                                        track.addEventListener('ended', () => {
-                                            console.info('Stream ended.');
-                                        });
-                                    });
-                                } else {
-                                    incoming.onaddtrack = () => {
-                                        if (videoShareRef.current) {
-                                            videoShareRef.current.play();
-                                        }
-                                    };
-                                }
-                            }
-                            console.info('Connected');
-                        });
-
-                        call.on('error', (error) => {
-                            console.error(error);
-                        });
+                if (conn) {
+                    const conn = self.peer.connect(props.screenshare.name);
+                    conn.on('open', () => {
+                        // console.log('watch open : --------- ', self.peer, self.id)
+                        if (self.peer) {
+                            conn.send(self.id);
+                        }
                     });
+
+                    self.peer &&
+                        self.peer.on('call', (call) => {
+                            // console.log('call : --------- ', call)
+
+                            call.answer();
+
+                            call.on('stream', (incoming) => {
+                                // console.log('stream : ------------', incoming);
+                                if (videoShareRef.current !== null) {
+                                    videoShareRef.current.srcObject = incoming;
+                                    if (incoming.active) {
+                                        videoShareRef.current.play();
+                                        incoming.getTracks().forEach((track) => {
+                                            track.addEventListener('ended', () => {
+                                                console.info('Stream ended.');
+                                            });
+                                        });
+                                    } else {
+                                        incoming.onaddtrack = () => {
+                                            if (videoShareRef.current) {
+                                                videoShareRef.current.play();
+                                            }
+                                        };
+                                    }
+                                }
+                                console.info('Connected');
+                            });
+
+                            call.on('error', (error) => {
+                                console.error(error);
+                            });
+                        });
+                }
             }
         }
     }, [props.screenshare.status]);
