@@ -93,8 +93,8 @@ const ScreenShare = React.memo((props) => {
                     });
             } else {
                 // console.log('watch session : -------------', props.screenshare, props.screenshare.name)
+                const conn = self.peer.connect(props.screenshare.name);
                 if (conn) {
-                    const conn = self.peer.connect(props.screenshare.name);
                     conn.on('open', () => {
                         // console.log('watch open : --------- ', self.peer, self.id)
                         if (self.peer) {
