@@ -29,8 +29,7 @@ function Conference(props) {
     const [mePos, setMePos] = useState({ x:0, y: 0 });
     const [sceneZoom, setSceneZoom] = useState(1);
 
-    // console.log('Conference : images: ------------- ', images)
-    // console.log('Conference : screenshares: ------------- ', screenshares)
+    // console.log('Conference : screenshare: ------------- ', screenshares)
     useEffect(() => {
         WebRTC.getInstance().startConference(dispatch, null, query.space, query.uname);
     }, []);

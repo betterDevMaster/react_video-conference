@@ -6767,8 +6767,8 @@
         /** @private */
         var dataEnabled = false;
         /** @private */
-        // var serverPath = 'https://webrtc.bcisummit.com/'; // this was null, but that was generating an error.
-        var serverPath = 'http://localhost:3111/'; // this is the tesing port.
+        var serverPath = 'https://webrtc.bcisummit.com/'; // this was null, but that was generating an error.
+        // var serverPath = 'http://localhost:3111/'; // this is the tesing port.
         /** @private */
         var roomOccupantListener = null;
         /** @private */

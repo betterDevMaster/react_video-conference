@@ -136,16 +136,10 @@ class WebRTC {
         });
         if (this.client) this.client.sendPeerMessage({ room: this.roomName }, 'screenshare-position', value);
     }
-    screenShareChange(content) {
-        this.enableScreenShare = content.status;
-        this.screenshares.forEach((screenshare) => {
-            if (screenshare.name === content.name) {
-                screenshare.status = content.status ? 'on' : 'off';
-            }
-        });
-        // console.log('---------share Change : ', this.screenshares)
+    screenShareChange(enable) {
+        this.enableScreenShare = enable;
         if (this.client)
-            this.client.sendPeerMessage({ room: this.roomName }, 'screenshare-change', { status: content.status ? 'on' : 'off' });
+            this.client.sendPeerMessage({ room: this.roomName }, 'screenshare-change', { status: enable ? 'on' : 'off' });
     }
     screenShareRemove(value) {
         if (WebRTC.getInstance().client) WebRTC.getInstance().client.sendPeerMessage({ room: this.roomName }, 'screenshare-remove', value);
@@ -156,10 +150,14 @@ class WebRTC {
     youtubePosition(value) {
         this.youtubes.forEach((youtube) => {
             if (youtube.name === value.name) {
+                // youtube.userid = value.userid;
                 youtube.defX = value.defX;
                 youtube.defY = value.defY;
                 youtube.width = value.width;
                 youtube.height = value.height;
+                // youtube.volume = value.volume;
+                // youtube.curtime = value.curtime;
+                // youtube.videoplay = value.videoplay;
             }
         });
         if (this.client) this.client.sendPeerMessage({ room: this.roomName }, 'youtube-position', value);
@@ -481,7 +479,6 @@ class WebRTC {
                         }
                     });
                 } else if (msgType === 'image-add') {
-                    // console.log('on peer image-add : ', content)
                     dispatch({
                         type: 'image_add',
                         value: {
@@ -602,11 +599,9 @@ class WebRTC {
                     WebRTC.getInstance().client.sendPeerMessage({ rtcId: peerId }, 'image-add', image);
                     WebRTC.getInstance().client.sendPeerMessage({ rtcId: peerId }, 'image-position', image);
                 });
-                // console.log(' accept : --------- ', WebRTC.getInstance().images, WebRTC.getInstance().screenshares)
                 WebRTC.getInstance().screenshares.forEach((screenshare) => {
                     WebRTC.getInstance().client.sendPeerMessage({ rtcId: peerId }, 'screenshare-add', screenshare);
                     WebRTC.getInstance().client.sendPeerMessage({ rtcId: peerId }, 'screenshare-position', screenshare);
-                    WebRTC.getInstance().client.sendPeerMessage({ rtcId: peerId }, 'screenshare-change', screenshare);
                 });
                 
                 // if (WebRTC.getInstance().client)
