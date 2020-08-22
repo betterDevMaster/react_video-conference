@@ -14,10 +14,13 @@ const ScreenShare = React.memo((props) => {
     const [isNavigatorSelect, setIsNavigatorSelect] = useState(false);
     var _mediaStream = null;
 
+    console.log('props.screenshare : ======== ', props.screenshare.userid, props.screenshare.status, self.peer)
     useEffect(() => {
         if (self.peer && props.screenshare.status === 'on') {
+            console.log('props.screenshare -------- on :------------ ', props.screenshare, self.peer)
+
             if (props.screenshare.userid === 'me') {
-                // console.log('share session : ---------', props.screenshare)
+                console.log('share session : ---------', props.screenshare)
 
                 self.peer.on('connection', (conn) => {
                     // console.log('connection : --------- ', self.peer, _mediaStream)
@@ -48,9 +51,9 @@ const ScreenShare = React.memo((props) => {
                             console.error('No video tag reference!');
                         }
 
-                        // console.log('getDisplayMedia : ---------', self.peer)
+                        // console.log('getDisplayMedia : ---------', self.peer, props.screenshare.status)
 
-                        WebRTC.getInstance().screenShareChange(props.screenshare.status === 'on');
+                        WebRTC.getInstance().screenShareChange({ status: props.screenshare.status === 'on', name: props.screenshare.name });
 
                         _mediaStream.getVideoTracks()[0].onended = () => {
                             dispatch({
@@ -92,9 +95,10 @@ const ScreenShare = React.memo((props) => {
                         }
                     });
             } else {
-                // console.log('watch session : -------------', props.screenshare, props.screenshare.name)
-
                 const conn = self.peer.connect(props.screenshare.name);
+                console.log('watch session : -------------', props.screenshare, self.peer, self.id, conn)
+                if ( !conn ) return;
+                
                 conn.on('open', () => {
                     // console.log('watch open : --------- ', self.peer, self.id)
                     if (self.peer) {
@@ -134,10 +138,15 @@ const ScreenShare = React.memo((props) => {
                             console.error(error);
                         });
                     });
+                
             }
         }
+    // }, [self.peer]);
     }, [props.screenshare.status]);
 
+    if (self.peer && props.screenshare.userid !== 'me') {
+        
+    }
     const handleScreenShareDragAndResize = (node, pos, scale) => {
         WebRTC.getInstance().screenSharePosition({
             name: props.screenshare.name,

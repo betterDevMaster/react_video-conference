@@ -8,7 +8,7 @@ const Button = React.memo(props => {
         if(props.onClick && props.status !== 'no')
             props.onClick();
         else {
-            toast.error('Session invalid.')
+            toast.info('Session initializing.')
         }
     }
     return (

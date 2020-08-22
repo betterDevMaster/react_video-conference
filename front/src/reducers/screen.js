@@ -68,10 +68,6 @@ const screens = (state = {bgMoving:false, videos: [], images: [], screenshares: 
                 images: moved_images
             }
         case "set_peer":
-            // console.log('reducer setPeer : ------- ', state, action, { 
-            //     ...state,
-            //     peer: action.value
-            // })
             return { 
                 ...state,
                 peer: action.value

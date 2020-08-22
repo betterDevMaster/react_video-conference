@@ -78,8 +78,8 @@ app.use('*', (req, res) => {
 
 // By default the listening server port is 8080 unless set by nconf or Heroku
 
-// var serverPort = 3111; // testing for the localhost
-var serverPort = 3000;  // for the product port
+var serverPort = 3111; // testing for the localhost
+// var serverPort = 3000;  // for the product port
 
 webServer = require('http').createServer(app).listen(serverPort);
 console.log("Http server is running on Port: " + serverPort)
