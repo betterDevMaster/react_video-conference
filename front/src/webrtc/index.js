@@ -136,10 +136,15 @@ class WebRTC {
         });
         if (this.client) this.client.sendPeerMessage({ room: this.roomName }, 'screenshare-position', value);
     }
-    screenShareChange(enable) {
-        this.enableScreenShare = enable;
+    screenShareChange(content) {
+        this.enableScreenShare = content.status;
+        this.screenshares.forEach((screenshare) => {
+            if (screenshare.name === content.name) {
+                screenshare.status = content.status ? 'on' : 'off';
+            }
+        });
         if (this.client)
-            this.client.sendPeerMessage({ room: this.roomName }, 'screenshare-change', { status: enable ? 'on' : 'off' });
+            this.client.sendPeerMessage({ room: this.roomName }, 'screenshare-change', { status: content.status ? 'on' : 'off' });
     }
     screenShareRemove(value) {
         if (WebRTC.getInstance().client) WebRTC.getInstance().client.sendPeerMessage({ room: this.roomName }, 'screenshare-remove', value);
@@ -602,6 +607,7 @@ class WebRTC {
                 WebRTC.getInstance().screenshares.forEach((screenshare) => {
                     WebRTC.getInstance().client.sendPeerMessage({ rtcId: peerId }, 'screenshare-add', screenshare);
                     WebRTC.getInstance().client.sendPeerMessage({ rtcId: peerId }, 'screenshare-position', screenshare);
+                    WebRTC.getInstance().client.sendPeerMessage({ rtcId: peerId }, 'screenshare-change', screenshare);
                 });
                 
                 // if (WebRTC.getInstance().client)

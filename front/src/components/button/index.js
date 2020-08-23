@@ -8,7 +8,7 @@ const Button = React.memo(props => {
         if(props.onClick && props.status !== 'no')
             props.onClick();
         else {
-            toast.info('Session initializing.')
+            toast.info('Session initializing. Wait a moment.')
         }
     }
     return (
