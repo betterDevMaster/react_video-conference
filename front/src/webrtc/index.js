@@ -592,7 +592,7 @@ class WebRTC {
                             type: 'user_add',
                             value: { id: peerId, name: peerName, stream, defPosX: position.x, defPosY: position.y }
                         });
-                        WebRTC.getInstance().onStreamConfigurationChange();
+                        // WebRTC.getInstance().onStreamConfigurationChange();
                     },
                     function (errorCode, errorText) {}
                 );
