@@ -123,56 +123,48 @@ export default class DragBox extends PureComponent {
         };
         switch (this.state.dragType) {
             case 'move':
-                {
-                    newPos.x = Math.max(1, Math.min(this.myRef.current.parentNode.parentNode.clientWidth / this.state.scale - 1, newPos.x));
-                    newPos.y = Math.max(
-                        1,
-                        Math.min(this.myRef.current.parentNode.parentNode.clientHeight / this.state.scale - 1, newPos.y)
-                    );
+                newPos.x = Math.max(1, Math.min(this.myRef.current.parentNode.parentNode.clientWidth / this.state.scale - 1, newPos.x));
+                newPos.y = Math.max(
+                    1,
+                    Math.min(this.myRef.current.parentNode.parentNode.clientHeight / this.state.scale - 1, newPos.y)
+                );
 
-                    this.setState({
-                        position: newPos
-                    });
-                }
+                this.setState({
+                    position: newPos
+                });
                 break;
             case 'resize-x':
-                {
-                    const w = Math.max(20, (e.pageX / this.state.scale) * 2 - this.state.rel.w);
-                    if (this.props.aspect) {
-                        this.setState({
-                            width: w,
-                            height: (w / this.props.initialRect.width) * this.props.initialRect.height
-                        });
-                    } else {
-                        this.setState({ width: w });
-                    }
+                const w = Math.max(20, (e.pageX / this.state.scale) * 2 - this.state.rel.w);
+                if (this.props.aspect) {
+                    this.setState({
+                        width: w,
+                        height: (w / this.props.initialRect.width) * this.props.initialRect.height
+                    });
+                } else {
+                    this.setState({ width: w });
                 }
                 break;
             case 'resize-y':
-                {
-                    const h = Math.max(20, (e.pageY / this.state.scale) * 2 - this.state.rel.h);
-                    if (this.props.aspect) {
-                        this.setState({
-                            height: h,
-                            width: (h / this.props.initialRect.height) * this.props.initialRect.width
-                        });
-                    } else {
-                        this.setState({ height: h });
-                    }
+                const h = Math.max(20, (e.pageY / this.state.scale) * 2 - this.state.rel.h);
+                if (this.props.aspect) {
+                    this.setState({
+                        height: h,
+                        width: (h / this.props.initialRect.height) * this.props.initialRect.width
+                    });
+                } else {
+                    this.setState({ height: h });
                 }
                 break;
             case 'resize-xy':
-                {
-                    const w = Math.max(20, (e.pageX / this.state.scale) * 2 - this.state.rel.w);
-                    const h = Math.max(20, (e.pageY / this.state.scale) * 2 - this.state.rel.h);
-                    if (this.props.aspect) {
-                        this.setState({
-                            width: w,
-                            height: (w / this.props.initialRect.width) * this.props.initialRect.height
-                        });
-                    } else {
-                        this.setState({ width: w, height: h });
-                    }
+                const xy_w = Math.max(20, (e.pageX / this.state.scale) * 2 - this.state.rel.w);
+                const xy_h = Math.max(20, (e.pageY / this.state.scale) * 2 - this.state.rel.h);
+                if (this.props.aspect) {
+                    this.setState({
+                        width: xy_w,
+                        height: (xy_w / this.props.initialRect.width) * this.props.initialRect.height
+                    });
+                } else {
+                    this.setState({ width: xy_w, height: xy_h });
                 }
                 break;
             default:

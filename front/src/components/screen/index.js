@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 
 import DragBox from '../draggable/DragBox';
 import WebRTC from '../../webrtc';

@@ -39,7 +39,7 @@ function ImageDialog(props){
         let reader = new FileReader();
         setFileName(event.target.files[0].name)
         reader.onload = function () {
-            var img = new Image;
+            var img = new Image();
             img.onload = function() {
                 setImgSize({width: img.width, height: img.height})
             };

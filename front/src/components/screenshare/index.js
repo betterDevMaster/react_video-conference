@@ -12,33 +12,18 @@ const ScreenShare = React.memo((props) => {
     const screenshare = useSelector((state) => state.buttons.screenshare);
     const videoShareRef = useRef(null);
     const [isNavigatorSelect, setIsNavigatorSelect] = useState(false);
-    var _mediaStream = null;
+    const _mediaStream = useRef(null);
 
     useEffect(() => {
-        // if (self.peer === undefined && props.screenshare.status === 'on') {
-        //     console.log('dispatch : --------------- ')
-        //     dispatch({
-        //         type: 'screenshare_change',
-        //         value: { status: 'off', userid: props.screenshare.userid }
-        //     });
-        // }
-        console.log('screenShare : -------------- ', props.screenshare.status, props.screenshare.userid, self.peer)
-
         if (self.peer && props.screenshare.status === 'on') {
             if (props.screenshare.userid === 'me') {
                 // console.log('share session : ---------', props.screenshare)
-
                 self.peer.on('connection', (conn) => {
-                    // console.log('connection : --------- ', self.peer, _mediaStream)
-
                     conn.on('data', (id) => {
-                        if (_mediaStream !== null && self.peer) {
-                            // console.log('data mediaStream : ---------', id, _mediaStream);
-
-                            self.peer.call(id, _mediaStream);
+                        if (_mediaStream.current !== null && self.peer) {
+                            self.peer.call(id, _mediaStream.current);
                         }
                     });
-
                     conn.on('error', () => {
                         console.error('Connection with self.peer was broken');
                     });
@@ -51,17 +36,13 @@ const ScreenShare = React.memo((props) => {
                         if (videoShareRef.current) {
                             videoShareRef.current.srcObject = mediaStream;
                             videoShareRef.current.play();
-                            _mediaStream = mediaStream;
-                            // console.log('mediastream : ---------- ', _mediaStream)
+                            _mediaStream.current = mediaStream;
                         } else {
                             console.error('No video tag reference!');
                         }
-
-                        // console.log('getDisplayMedia : ---------', self.peer)
-
                         WebRTC.getInstance().screenShareChange({ status: props.screenshare.status === 'on', name: props.screenshare.name });
 
-                        _mediaStream.getVideoTracks()[0].onended = () => {
+                        _mediaStream.current.getVideoTracks()[0].onended = () => {
                             dispatch({
                                 type: 'screenshare_change',
                                 value: { status: props.screenshare.status === 'on' ? 'off' : 'on', userid: 'me' }
@@ -113,12 +94,8 @@ const ScreenShare = React.memo((props) => {
 
                     self.peer &&
                         self.peer.on('call', (call) => {
-                            // console.log('watch call : --------- ', call)
-
                             call.answer();
-
                             call.on('stream', (incoming) => {
-                                // console.log('stream : ------------', incoming);
                                 if (videoShareRef.current !== null) {
                                     videoShareRef.current.srcObject = incoming;
                                     if (incoming.active) {
@@ -145,6 +122,10 @@ const ScreenShare = React.memo((props) => {
                         });
                 }
             }
+        }
+
+        if (props.screenshare.status === 'off' && props.screenshare.userid === 'me' && _mediaStream.current) {
+            _mediaStream.current.getVideoTracks()[0].stop()
         }
     }, [props.screenshare.status, self.peer]);
 

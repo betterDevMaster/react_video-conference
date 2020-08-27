@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 // import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import * as qs from 'query-string';
@@ -15,7 +15,6 @@ import img_small from '../images/map-small@2x.0c2a372b.png';
 import img_big from '../images/map-big@2x.44a3f15c.png';
 
 import './index.css';
-import { faMousePointer } from '@fortawesome/free-solid-svg-icons';
 
 function Conference(props) {
     const dispatch = useDispatch();

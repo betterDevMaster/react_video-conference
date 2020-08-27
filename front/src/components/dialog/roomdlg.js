@@ -1,6 +1,6 @@
 import React, {useEffect, useState } from 'react';
-import ReactDOM from 'react-dom'
-import Recaptcha from 'react-recaptcha';
+// import ReactDOM from 'react-dom'
+// import Recaptcha from 'react-recaptcha';
 
 import Spinner from './Spinner'
 import './index.css';
@@ -10,7 +10,8 @@ import { API_URL } from '../../config'
 
 
 function RoomDialog(props){
-    const [isVerified, setIsVerified] = useState(true);
+    // const [isVerified, setIsVerified] = useState(true);
+    const isVerified = true;
     const [sendingEmail, setSendingEmail] = useState(false);
     const [mailStatus, setMailStatus] = useState(2);
     const [email, setEmail] = useState('');
@@ -89,11 +90,11 @@ function RoomDialog(props){
             // setIsVerified(false);
         }, 100);
     }
-    const onLoadCallback = function () {
-    };
-    const onVerifyCallback = function () {
-        // setIsVerified(true);
-    };
+    // const onLoadCallback = function () {
+    // };
+    // const onVerifyCallback = function () {
+    //     // setIsVerified(true);
+    // };
     useEffect(()=>{
         if (mailStatus === 2) {
             // ReactDOM.render(

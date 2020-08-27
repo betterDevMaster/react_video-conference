@@ -3,10 +3,6 @@ import ReactSpinner from 'react-spinkit'
 // import {Redirect} from 'react-router-dom';
 import * as qs from 'query-string'
 
-import WebRTC from '../webrtc';
-import Utils from '../utils/position'
-import logosvg from '../images/logo.svg'
-import logosmallsvg from '../images/logo-small.svg'
 import joinbtn from '../images/joinbtn.svg'
 import Footer from '../components/footer';
 import './index.css';

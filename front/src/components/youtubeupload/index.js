@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { PropTypes } from 'react';
+import { useDispatch } from 'react-redux';
 import YouTube from 'react-youtube';
 import DragBox from '../draggable/DragBox';
 import './index.css';
@@ -8,9 +7,6 @@ import MicMute1 from '../../images/mic-mute.svg';
 import MicMute0 from '../../images/mic-mute1.svg';
 import closevideo from '../../images/closevideo.svg';
 import WebRTC from '../../webrtc';
-
-import Utils from '../../utils/position';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 const YoutubeUpload = React.memo((props) => {
     const videoRef = useRef(null);
@@ -90,7 +86,7 @@ const YoutubeUpload = React.memo((props) => {
     };
     const toggleChange = () => {
         console.log(youtubeMute)
-        if (youtubeMute == 'on') {
+        if (youtubeMute === 'on') {
             if (videoRef.current) {
                 document.getElementById(youtubeMuteAudio).src = MicMute1;
                 setYoutubeMute('off');
@@ -125,18 +121,12 @@ const YoutubeUpload = React.memo((props) => {
                 data-v-7e3fe256=""
                 key={props.video.id}
                 className="youtube-el"
-                style={{ width: '100%' }}
-                style={{ zIndex: props.video.id === 'me' ? 10 : 5 }}
+                style={{ width: '100%', zIndex: props.video.id === 'me' ? 10 : 5 }}
             >
                 <div data-v-a995c326="" data-v-c1f79ed4="" className="header pointer hidden">
                     <div data-v-a995c326="" className="title">
                         Pinned by {props.video.username}
                     </div>
-                    {props.video.id === 'me' && (
-                        <div onClick={() => handleClose(props.video.name)}>
-                            <img data-v-6a2f6b36 className="close" src={closevideo} alt="closevideo.svg" />
-                        </div>
-                    )}
                 </div>
 
                 <div data-v-c1f79ed4="" className={`player ${props.video.id === 'me' ? null : 'pointer-events-none'}`}>

@@ -7,7 +7,6 @@ const easyrtc = require('open-easyrtc');
 const fs = require('fs');
 const Handlebars = require('handlebars');
 const io = require('socket.io');
-const RTCMultiConnectionServer = require('rtcmulticonnection-server');
 
 const app = express()
 const emailController = require('./email/email.controller')

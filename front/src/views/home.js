@@ -1,6 +1,6 @@
 import React from "react";
 
-import marksvg from '../images/logo-mark.svg'
+// import marksvg from '../images/logo-mark.svg'
 import Dialog from '../components/dialog';
 import RoomDialog from '../components/dialog/roomdlg';
 import Footer from '../components/footer';
