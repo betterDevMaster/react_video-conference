@@ -4,6 +4,8 @@ import { useDispatch } from 'react-redux';
 import DragBox from '../draggable/DragBox';
 import WebRTC from '../../webrtc';
 import Peer from '../../RTCMulti';
+// import Peer from 'peerjs';
+
 import Utils from '../../utils/position';
 
 import './index.css';
@@ -11,63 +13,89 @@ import './index.css';
 const Screen = React.memo((props) => {
     const dispatch = useDispatch();
     const videoRef = useRef(null);
-    const peer = new Peer(process.env.NODE_ENV === 'production');
+    
+    // const peer = new Peer(WebRTC.getInstance().getRoomName(), { host: 'localhost', port: 3112, path:'/peerjs', debug:true});
+
+    // const peer = new Peer(WebRTC.getInstance().getRoomName(), {
+    //     host: 'localhost',
+    //     port: 3112,
+    //     path: '/myapp'
+    // });
+
+    // var peer = new Peer({
+    //     key: 'peerjs',
+    //     path: '/myapp', // <==========
+    //     host: 'localhost',
+    //     port: 9000
+    // });
+    // var peer = new Peer(); 
+    // var conn = peer.connect('1233d');
+    // // on open will be launch when you successfully connect to PeerServer
+    // conn.on('open', function(){
+    // // here you have conn.id
+    // conn.send('hi!');
+    // });
 
     useEffect(() => {
-        var video = document.getElementById(props.user.stream.id);
+        const video = document.getElementById(props.user.stream.id);
+        const peer = new Peer(process.env.NODE_ENV === 'production');
+
         if (video) {
             window.easyrtc.setVideoObjectSrc(video, props.user.stream);
         }
 
-        // console.log('props.user : -----------', props.user, peer);
-        if (props.user.id === 'me' && peer._id === null) {
+        if (props.user.id === 'me') {
             props.onGoToFirstPosition({
                 x: props.sceneZoom ? props.user.defPosX / props.sceneZoom : props.user.defPosX,
                 y: props.sceneZoom ? props.user.defPosY / props.sceneZoom : props.user.defPosX
             });
 
-            if (!navigator || !navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-                console.error('Use google chrome!');
-                return;
-            }
-            // Connect peer
-            peer.on('open', (id) => {
-                // console.log('peer open : ---------', id, peer);
+            if (peer) {
+                console.log('props.user : -----------', props.user, peer);
 
-                const draggableBack = document.getElementsByClassName('drag-container')[0];
-                const posMe = Utils.getPositionFromStyle(draggableBack);
-                const scaleMe = Utils.getValueFromAttr(draggableBack, 'curzoom').value;
+                // if (!navigator || !navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+                //     console.error('Use google chrome!');
+                //     return;
+                // }
+                // Connect peer
+                peer.on('open', (id) => {
+                    console.log('peer open : ---------', id, peer);
 
-                const calc_def_x = (Math.abs(-posMe.x) + Utils.width() / 2) / scaleMe;
-                const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2) / scaleMe;
+                    const draggableBack = document.getElementsByClassName('drag-container')[0];
+                    const posMe = Utils.getPositionFromStyle(draggableBack);
+                    const scaleMe = Utils.getValueFromAttr(draggableBack, 'curzoom').value;
 
-                const opt = { width: 600, height: 450 };
-                dispatch({
-                    type: 'set_peer',
-                    value: { peer: peer, id: id }
-                });
-                dispatch({
-                    type: 'screenshare_add',
-                    value: {
-                        userid: 'me',
-                        username: 'Me',
+                    const calc_def_x = (Math.abs(-posMe.x) + Utils.width() / 2) / scaleMe;
+                    const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2) / scaleMe;
+
+                    const opt = { width: 600, height: 450 };
+                    dispatch({
+                        type: 'set_peer',
+                        value: { peer: peer, id: id }
+                    });
+                    dispatch({
+                        type: 'screenshare_add',
+                        value: {
+                            userid: 'me',
+                            username: 'Me',
+                            name: id,
+                            width: opt.width,
+                            height: opt.height,
+                            defX: calc_def_x,
+                            defY: calc_def_y,
+                            status: 'off'
+                        }
+                    });
+                    WebRTC.getInstance().screenShareAdd({
                         name: id,
                         width: opt.width,
                         height: opt.height,
                         defX: calc_def_x,
                         defY: calc_def_y,
                         status: 'off'
-                    }
+                    });
                 });
-                WebRTC.getInstance().screenShareAdd({
-                    name: id,
-                    width: opt.width,
-                    height: opt.height,
-                    defX: calc_def_x,
-                    defY: calc_def_y,
-                    status: 'off'
-                });
-            });
+            }
         }
     }, []);
 
@@ -104,7 +132,7 @@ const Screen = React.memo((props) => {
             >
                 <div
                     key={props.user.id}
-                    className="screen"
+                    className='screen'
                     id={props.user.id}
                     style={{
                         width: '100%',
@@ -116,11 +144,11 @@ const Screen = React.memo((props) => {
                 >
                     <video
                         ref={videoRef}
-                        className="video"
+                        className='video'
                         style={{ borderRadius: '50%' }}
                         id={props.user.stream.id}
-                        controls=""
-                        loop=""
+                        controls=''
+                        loop=''
                         muted={'me' === props.user.id}
                     ></video>
                 </div>

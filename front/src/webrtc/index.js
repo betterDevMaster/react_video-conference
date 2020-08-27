@@ -324,7 +324,7 @@ class WebRTC {
                 //     continue;
                 peer.pc.getSenders().forEach((sender) => {
                     if (sender.track) sender.track.enabled = false;
-                    // sender.track.stop()
+                    sender.track.stop()
                 });
                 //sender.replaceTrack(null))
             }

@@ -1,62 +1,48 @@
-require('dotenv').config()
-const express = require('express')
-const mongoose = require('mongoose')
-const cors = require('cors')
-
-const easyrtc = require('open-easyrtc');
-const fs = require('fs');
-const Handlebars = require('handlebars');
-const io = require('socket.io');
+require("dotenv").config()
+const express = require("express")
+const mongoose = require("mongoose")
+const cors = require("cors")
+const path = require("path")
+const easyrtc = require("open-easyrtc")
+const fs = require("fs")
+const Handlebars = require("handlebars")
+const io = require("socket.io")
+var ip = require("ip")
 
 const app = express()
-const emailController = require('./email/email.controller')
-const { PORT, CLIENT_ORIGIN, DB_URL } = require('./config')
+const emailController = require("./email/email.controller")
+const { PORT, CLIENT_ORIGIN, DB_URL } = require("./config")
 
-var webServer = null;
+var webServer = null
 // Only allow requests from our client
-const corsOpts = {
-  origin: '*',
-  methods: [
-    'GET',
-    'POST',
-  ],
-  allowedHeaders: [
-    'Content-Type',
-  ],
-};
-// NODE_TLS_REJECT_UNAUTHORIZED='0'
+app.use(cors())
 
-app.use(cors(corsOpts));
-app.use(function(req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  next();
-});
-// app.use(cors())
-
-var debugMode = false;
+var debugMode = false
 // Set up routes for static resources
-app.use('/', express.static(__dirname + '/public'));
-app.use('/room', express.static(__dirname + '/public'));
-app.use('/login', express.static(__dirname + '/public'));
-app.use('/conference', express.static(__dirname + '/public'));
-app.use('/js', express.static(__dirname + '/public/js'));
-app.use('/static', express.static(__dirname + '/public/static'));
-app.use('/static/css', express.static(__dirname + '/public/static/css'));
-app.use('/static/js', express.static(__dirname + '/public/static/js'));
-app.use('/static/media', express.static(__dirname + '/public/static/media'));
+app.use(express.static(path.join(__dirname, "build")))
+app.get("/*", function (req, res) {
+    res.sendFile(path.join(__dirname, "build", "index.html"))
+})
+
+// app.use('/', express.static(__dirname + '/public'));
+// app.use('/room', express.static(__dirname + '/public'));
+// app.use('/login', express.static(__dirname + '/public'));
+// app.use('/conference', express.static(__dirname + '/public'));
+// app.use('/js', express.static(__dirname + '/public/js'));
+// app.use('/static', express.static(__dirname + '/public/static'));
+// app.use('/static/css', express.static(__dirname + '/public/static/css'));
+// app.use('/static/js', express.static(__dirname + '/public/static/js'));
+// app.use('/static/media', express.static(__dirname + '/public/static/media'));
 // Allow the app to accept JSON on req.body
 app.use(express.json())
 
 // This is the endpoint that is hit from the onSubmit handler in Landing.js
 // The callback is shelled off to a controller file to keep this file light.
-app.post('/email', emailController.collectEmail)
+app.post("/email", emailController.collectEmail)
 
 // Catch all to handle all other requests that come into the app.
-app.use('*', (req, res) => {
-  res.status(404).json({ msg: 'Not Found' })
+app.use("*", (req, res) => {
+    res.status(404).json({ msg: "Not Found" })
 })
 
 // Connecting the database and then starting the app.
@@ -77,144 +63,156 @@ app.use('*', (req, res) => {
 
 // By default the listening server port is 8080 unless set by nconf or Heroku
 
-// var serverPort = 3111; // testing for the localhost
+// var serverPort = 3111 // testing for the localhost
 var serverPort = 3000;  // for the product port
 
-webServer = require('http').createServer(app).listen(serverPort);
+webServer = require("http").createServer(app).listen(serverPort)
 console.log("Http server is running on Port: " + serverPort)
 
-var socketServer = io.listen(webServer, { 'log level': 0 });
+var socketServer = io.listen(webServer, { "log level": 0 })
 
 // Set up easyrtc specific options
-easyrtc.setOption('demosEnable', false);
+easyrtc.setOption("demosEnable", false)
 
 // Use appIceServers from settings.json if provided. The format should be the same
 // as that used by easyrtc (http://easyrtc.com/docs/guides/easyrtc_server_configuration.php)
-easyrtc.setOption('appIceServers', [
+easyrtc.setOption("appIceServers", [
     {
-        url: 'stun:stun.l.google.com:19302'
+        url: "stun:stun.l.google.com:19302",
     },
     {
-        url: 'stun:stun.sipgate.net'
+        url: "stun:stun.sipgate.net",
     },
     {
-        url: 'stun:217.10.68.152'
+        url: "stun:217.10.68.152",
     },
     {
-        url: 'stun:stun.sipgate.net:10000'
+        url: "stun:stun.sipgate.net:10000",
     },
     {
-        url: 'stun:217.10.68.152:10000'
-    }
-]);
-easyrtc.listen(app, socketServer);
+        url: "stun:217.10.68.152:10000",
+    },
+])
+easyrtc.listen(app, socketServer)
 
 var peerPositions = []
 var peerStreams = []
 
-const calcualteMyPosition = (peerId, width, height, socketId)=>{
-  if(peerPositions.length === 0){
-    const retPos = {x:width/2, y:height/2, peerId, socketId}
-    peerPositions.push(retPos);
-    return retPos;
-  }
-  const center = {x:0, y:0};
+const calcualteMyPosition = (peerId, width, height, socketId) => {
+    if (peerPositions.length === 0) {
+        const retPos = { x: width / 2, y: height / 2, peerId, socketId }
+        peerPositions.push(retPos)
+        return retPos
+    }
+    const center = { x: 0, y: 0 }
 
-  center.x = peerPositions[peerPositions.length-1].x
-  center.y = peerPositions[peerPositions.length-1].y
+    center.x = peerPositions[peerPositions.length - 1].x
+    center.y = peerPositions[peerPositions.length - 1].y
 
-  const ang = Math.random() * 2 * Math.PI
-  var posX = Math.floor(center.x + Math.cos(ang)* 100)
-  var posY = Math.floor(center.y + Math.sin(ang)* 100)
+    const ang = Math.random() * 2 * Math.PI
+    var posX = Math.floor(center.x + Math.cos(ang) * 100)
+    var posY = Math.floor(center.y + Math.sin(ang) * 100)
 
-  if (posX >= width - 100)
-    posX = width - 100
-  else if (posX <= 100)
-    posX = 100
-  if (posY >= height - 100)
-    posY = height - 100
-  else if (posY <= 100)
-    posY = 100
+    if (posX >= width - 100) posX = width - 100
+    else if (posX <= 100) posX = 100
+    if (posY >= height - 100) posY = height - 100
+    else if (posY <= 100) posY = 100
 
-  const retPos = {
-                  x: posX,
-                  y: posY,
-                  peerId,
-                  socketId
-                }
-  peerPositions.push(retPos)
+    const retPos = {
+        x: posX,
+        y: posY,
+        peerId,
+        socketId,
+    }
+    peerPositions.push(retPos)
 
-  // console.log('position: before: ', peerPositions, peerPositions.length, peerPositions[peerPositions.length-1], '-------------------')
+    // console.log('position: before: ', peerPositions, peerPositions.length, peerPositions[peerPositions.length-1], '-------------------')
 
-  peerPositions = peerPositions.filter((c, index) => {
-    return peerPositions.indexOf(c) === index;
-  });
-  
-  return retPos;
+    peerPositions = peerPositions.filter((c, index) => {
+        return peerPositions.indexOf(c) === index
+    })
+
+    return retPos
 }
 
-easyrtc.events.on("easyrtcMsg", function(connectionObj, message, callback, next) {
-  switch(message.msgType){
-    case 'get_my_position':
-      const pos = calcualteMyPosition(message.msgData.clientId, message.msgData.sWidth, message.msgData.sHeight, connectionObj.socket.id);
-      callback({msgType:'set_your_position', msgData: pos})
-      return true;
-    case 'get_peer_position':
-      peerPositions.forEach(pos=>{
-        if(pos.peerId === message.msgData){
-          callback({msgType:'set_peer_position', msgData: pos})
-        }
-      })
-      peerPositions = peerPositions.filter((c, peerId) => {
-        return peerPositions.indexOf(c) === peerId;
-      });
-      return true;
-    case 'set_peer_position':
-      peerPositions.forEach(pos=>{
+easyrtc.events.on("easyrtcMsg", function (
+    connectionObj,
+    message,
+    callback,
+    next
+) {
+    switch (message.msgType) {
+        case "get_my_position":
+            const pos = calcualteMyPosition(
+                message.msgData.clientId,
+                message.msgData.sWidth,
+                message.msgData.sHeight,
+                connectionObj.socket.id
+            )
+            callback({ msgType: "set_your_position", msgData: pos })
+            return true
+        case "get_peer_position":
+            peerPositions.forEach((pos) => {
+                if (pos.peerId === message.msgData) {
+                    callback({ msgType: "set_peer_position", msgData: pos })
+                }
+            })
+            peerPositions = peerPositions.filter((c, peerId) => {
+                return peerPositions.indexOf(c) === peerId
+            })
+            return true
+        case "set_peer_position":
+            peerPositions.forEach((pos) => {
+                if (pos.peerId === message.msgData.id) {
+                    pos.x = message.msgData.position.x
+                    pos.y = message.msgData.position.y
+                }
+            })
+            peerPositions = peerPositions.filter((c, peerId) => {
+                return peerPositions.indexOf(c) === peerId
+            })
+            return true
+        case "set_peer_stream":
+            console.log("set_peer_stream : ", message.msgData)
+            peerStreams.push(message.msgData)
+            return true
+    }
 
-        if(pos.peerId === message.msgData.id){
-          pos.x = message.msgData.position.x;
-          pos.y = message.msgData.position.y;
-        }
-      })
-      peerPositions = peerPositions.filter((c, peerId) => {
-        return peerPositions.indexOf(c) === peerId;
-      });
-      return true;
-    case 'set_peer_stream':
-      console.log('set_peer_stream : ', message.msgData)
-      peerStreams.push(message.msgData)
-      return true
-  }
-
-  connectionObj.events.emitDefault("easyrtcMsg", connectionObj, message, callback, next);
-});
-easyrtc.events.on("roomLeave", function(connectionObj, roomName, callback){
-  peerPositions = peerPositions.filter((peer)=>peer.socketId !== connectionObj.socket.id)
-  connectionObj.events.emitDefault("roomLeave", connectionObj, roomName, callback);
-});
+    connectionObj.events.emitDefault(
+        "easyrtcMsg",
+        connectionObj,
+        message,
+        callback,
+        next
+    )
+})
+easyrtc.events.on("roomLeave", function (connectionObj, roomName, callback) {
+    peerPositions = peerPositions.filter(
+        (peer) => peer.socketId !== connectionObj.socket.id
+    )
+    connectionObj.events.emitDefault(
+        "roomLeave",
+        connectionObj,
+        roomName,
+        callback
+    )
+})
 
 
-// var RTC_PORT = 3222
-// var httpApp;
+// const { ExpressPeerServer } = require('peer');
+// const server = require('http').createServer(app);
+// const peerServer = ExpressPeerServer(server, {
+//   debug: true,
+//   path: '/myapp'
+// });
 
-// httpApp = require('http').createServer(app).listen(process.env.PORT || RTC_PORT, process.env.IP || "0.0.0.0");
-// console.log("Http server is running on Port: " + RTC_PORT)
+// app.use('/peerjs', peerServer);
 
-// io(httpApp).on('connection', function(socket) {
-//   RTCMultiConnectionServer.addSocket(socket);
+// server.listen(9000);
+// peerServer.on('connection', (client) => { 
+//     console.log('peerServer Connection : --- ')
+// });
 
-//   // ----------------------
-//   // below code is optional
-
-//   const params = socket.handshake.query;
-//   console.log('-----------------socket server : ', params)
-
-//   if (!params.socketCustomEvent) {
-//       params.socketCustomEvent = 'custom-message';
-//   }
-
-//   socket.on(params.socketCustomEvent, function(message) {
-//       socket.broadcast.emit(params.socketCustomEvent, message);
-//   });
+// peerServer.on('disconnect', (client) => { 
+//     console.log('peerServer Disconnection : --------')  
 // });
