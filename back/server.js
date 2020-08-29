@@ -19,9 +19,9 @@ app.use(cors())
 
 var debugMode = false
 // Set up routes for static resources
-app.use(express.static(path.join(__dirname, "build")))
+app.use(express.static(path.join(__dirname, "public")))
 app.get("/*", function (req, res) {
-    res.sendFile(path.join(__dirname, "build", "index.html"))
+    res.sendFile(path.join(__dirname, "public", "index.html"))
 })
 
 // app.use('/', express.static(__dirname + '/public'));
@@ -41,9 +41,9 @@ app.use(express.json())
 app.post("/email", emailController.collectEmail)
 
 // Catch all to handle all other requests that come into the app.
-app.use("*", (req, res) => {
-    res.status(404).json({ msg: "Not Found" })
-})
+// app.use("*", (req, res) => {
+//     res.status(404).json({ msg: "Not Found" })
+// })
 
 // Connecting the database and then starting the app.
 // mongoose.connect(DB_URL, {

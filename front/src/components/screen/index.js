@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import DragBox from '../draggable/DragBox';
 import WebRTC from '../../webrtc';
 import Peer from '../../RTCMulti';
-// import Peer from 'peerjs';
 
 import Utils from '../../utils/position';
 
@@ -14,28 +13,6 @@ const Screen = React.memo((props) => {
     const dispatch = useDispatch();
     const videoRef = useRef(null);
     
-    // const peer = new Peer(WebRTC.getInstance().getRoomName(), { host: 'localhost', port: 3112, path:'/peerjs', debug:true});
-
-    // const peer = new Peer(WebRTC.getInstance().getRoomName(), {
-    //     host: 'localhost',
-    //     port: 3112,
-    //     path: '/myapp'
-    // });
-
-    // var peer = new Peer({
-    //     key: 'peerjs',
-    //     path: '/myapp', // <==========
-    //     host: 'localhost',
-    //     port: 9000
-    // });
-    // var peer = new Peer(); 
-    // var conn = peer.connect('1233d');
-    // // on open will be launch when you successfully connect to PeerServer
-    // conn.on('open', function(){
-    // // here you have conn.id
-    // conn.send('hi!');
-    // });
-
     useEffect(() => {
         const video = document.getElementById(props.user.stream.id);
         const peer = new Peer(process.env.NODE_ENV === 'production');
@@ -51,12 +28,6 @@ const Screen = React.memo((props) => {
             });
 
             if (peer) {
-                // console.log('props.user : -----------', props.user, peer);
-
-                // if (!navigator || !navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-                //     console.error('Use google chrome!');
-                //     return;
-                // }
                 // Connect peer
                 peer.on('open', (id) => {
                     // console.log('peer open : ---------', id, peer);
