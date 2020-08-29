@@ -17,7 +17,7 @@ const ScreenShare = React.memo((props) => {
     useEffect(() => {
         if (self.peer && props.screenshare.status === 'on') {
             if (props.screenshare.userid === 'me') {
-                console.log('share session : ---------', props.screenshare)
+                // console.log('share session : ---------', props.screenshare)
                 self.peer.on('connection', (conn) => {
                     conn.on('data', (id) => {
                         if (_mediaStream.current !== null && self.peer) {
@@ -82,7 +82,7 @@ const ScreenShare = React.memo((props) => {
                         }
                     });
             } else {
-                console.log('watch session : -------------', props.screenshare, props.screenshare.name)
+                // console.log('watch session : -------------', props.screenshare, props.screenshare.name)
                 const conn = self.peer.connect(props.screenshare.name);
                 if (conn) {
                     conn.on('open', () => {

@@ -28,7 +28,7 @@ function Conference(props) {
     const [mePos, setMePos] = useState({ x:0, y: 0 });
     const [sceneZoom, setSceneZoom] = useState(1);
 
-    // console.log('Conference : screenshare: ------------- ', screenshares)
+    // console.log('Conference : ------------- ', query)
     useEffect(() => {
         WebRTC.getInstance().startConference(dispatch, null, query.space, query.uname);
     }, []);
@@ -169,9 +169,9 @@ function Conference(props) {
                             room={query.space}
                         />
                     ))}
-                    {screenshares.map((screenshare) => (
+                    {screenshares.map((screenshare, key) => (
                         <ScreenShare
-                            key={screenshare.name}
+                            key={'share_' + key}
                             screenshare={screenshare}
                             pos={pos}
                             sceneZoom={sceneZoom}

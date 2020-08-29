@@ -51,7 +51,7 @@ const Screen = React.memo((props) => {
             });
 
             if (peer) {
-                console.log('props.user : -----------', props.user, peer);
+                // console.log('props.user : -----------', props.user, peer);
 
                 // if (!navigator || !navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
                 //     console.error('Use google chrome!');
@@ -59,7 +59,7 @@ const Screen = React.memo((props) => {
                 // }
                 // Connect peer
                 peer.on('open', (id) => {
-                    console.log('peer open : ---------', id, peer);
+                    // console.log('peer open : ---------', id, peer);
 
                     const draggableBack = document.getElementsByClassName('drag-container')[0];
                     const posMe = Utils.getPositionFromStyle(draggableBack);

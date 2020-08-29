@@ -10,6 +10,7 @@ class WebRTC {
     enableScreenShare = true;
     enableCamera = true;
     enableMic = true;
+    stopTrack = false;
     screenStream = {};
     width = 3000;
     height = 2000;
@@ -107,16 +108,16 @@ class WebRTC {
         };
     }
     toggleCamera(enable) {
+        window.easyrtc.enableCamera(enable);
         this.enableCamera = enable;
-        // window.easyrtc.enableCamera(enable);
-        this.onStreamConfigurationChange();
+        this.handleHeaderToogle();
         if (this.client)
             this.client.sendPeerMessage({ room: this.roomName }, 'media-presence', { type: 'camera', status: enable ? 'on' : 'off' });
     }
     toggleMic(enable) {
+        window.easyrtc.enableMicrophone(enable);
         this.enableMic = enable;
-        // window.easyrtc.enableMicrophone(enable);
-        this.onStreamConfigurationChange();
+        this.handleHeaderToogle();
         if (this.client)
             this.client.sendPeerMessage({ room: this.roomName }, 'media-presence', { type: 'mic', status: enable ? 'on' : 'off' });
     }
@@ -155,14 +156,10 @@ class WebRTC {
     youtubePosition(value) {
         this.youtubes.forEach((youtube) => {
             if (youtube.name === value.name) {
-                // youtube.userid = value.userid;
                 youtube.defX = value.defX;
                 youtube.defY = value.defY;
                 youtube.width = value.width;
                 youtube.height = value.height;
-                // youtube.volume = value.volume;
-                // youtube.curtime = value.curtime;
-                // youtube.videoplay = value.videoplay;
             }
         });
         if (this.client) this.client.sendPeerMessage({ room: this.roomName }, 'youtube-position', value);
@@ -209,7 +206,7 @@ class WebRTC {
             return rec.name !== value.name;
         });
     }
-    
+
     closeClient(cusId) {
         this.dispatch({ type: 'user_remove', value: { id: cusId } });
         window.easyrtc.disconnect();
@@ -254,17 +251,6 @@ class WebRTC {
         fileInput[0].click();
         // .trigger('click');
     }
-    // exitRoom(){
-    //     if(this.owner === 'true'){
-    //         this.sendMessage('Room closed.');
-    //         window.easyrtc.sendPeerMessage({
-    //             targetRoom: WebRTC.getInstance().roomName
-    //         }, 'close');
-    //         this.dispatch({type:'chat_add', value:{username: 'Me', userid: 'me', text: 'Room closed.', align: 'right', time: Date.now()}})
-    //     }
-    //     this.closeClient()
-    // }
-
     updateStreamMode() {
         // get getUserMedia mode
         let mode = { video: false, audio: false };
@@ -283,81 +269,44 @@ class WebRTC {
         }
         this.currentContraintMode = mode;
     }
-
-    onStreamConfigurationChange() {
-        if (!this.enableScreenShare) {
-            //now screen sharing status...
-            const peers = window.easyrtc.getPeerConnections();
-            for (const id in peers) {
-                const peer = peers[id];
-
-                peer.pc.getSenders().map((sender) => {
-                    if (WebRTC.getInstance().screenStream) {
-                        sender.replaceTrack(
-                            WebRTC.getInstance()
-                                .screenStream.getTracks()
-                                .find((track) => {
-                                    return track.kind === sender.track.kind;
-                                })
-                        );
-                    }
-                });
+    handleHeaderToogle() {
+        const local = window.easyrtc.getLocalStream();
+        if (!WebRTC.getInstance().enableCamera && !WebRTC.getInstance().enableMic) {
+            for (const track of local.getTracks()) {
+                track.stop();
             }
-            return;
+            this.stopTrack = true
+            return
         }
-
+        if (this.stopTrack) {
+            this.stopTrack = false
+            this.onStreamConfigurationChange()
+        }
+    }
+    onStreamConfigurationChange() {
         this.updateStreamMode();
         const local = window.easyrtc.getLocalStream();
-        // local.getTracks().forEach((track) => {
-        //     track.stop();
-        // });
-
-        const mode = { ...this.currentContraintMode };
-        if (!WebRTC.getInstance().enableCamera) mode.video = false;
-        if (!WebRTC.getInstance().enableMic) mode.audio = false;
-
-        if (!mode.video && !mode.audio) {
-            const peers = window.easyrtc.getPeerConnections();
-            for (const id in peers) {
-                const peer = peers[id];
-                // if(peer.cancelled)
-                //     continue;
-                peer.pc.getSenders().forEach((sender) => {
-                    if (sender.track) sender.track.enabled = false;
-                    sender.track.stop()
-                });
-                //sender.replaceTrack(null))
-            }
-            return;
-        }
-
-        navigator.mediaDevices.getUserMedia(mode).then((stream) => {
+        navigator.mediaDevices.getUserMedia(this.currentContraintMode).then((stream) => {
             // replace local stream
             stream.getTracks().forEach((track) => {
                 local.addTrack(track);
             });
 
             const video_me = document.getElementById(local.id);
+            window.easyrtc.setVideoObjectSrc(video_me, stream);
 
-            if (video_me) window.easyrtc.setVideoObjectSrc(video_me, stream);
-
-            window.easyrtc.enableCamera(WebRTC.getInstance().enableCamera);
-            window.easyrtc.enableMicrophone(WebRTC.getInstance().enableMic);
-
+            // send it to remote
             const peers = window.easyrtc.getPeerConnections();
-
             for (const id in peers) {
                 const peer = peers[id];
                 if (peer.cancelled) continue;
-                peer.pc.getSenders().forEach((sender) => {
-                    const kind = sender.track.kind;
-                    // if(kind === 'video'){
-                    const local_track = stream.getTracks().find((track) => track.kind === kind);
-                    if (local_track) {
-                        sender.replaceTrack(local_track);
-                        sender.track.enabled = true;
-                    } else sender.track.enabled = false;
-                    // }
+                peer.pc.getSenders().map((sender) => {
+                    
+                    sender.replaceTrack(
+                        stream.getTracks().find((track) => {
+                            return track.kind === sender.track.kind;
+                        })
+                    );
                 });
             }
         });
@@ -406,10 +355,11 @@ class WebRTC {
         window.localStorage.removeItem('t');
         window.localStorage.removeItem('r');
 
-        window.easyrtc.enableDataChannels(false);
+        window.easyrtc.enableDataChannels(true);
+
         window.VTCCore.initialize({
-            cameraIsEnabled: true,
-            micIsEnabled: true
+            cameraIsEnabled: this.enableCamera,
+            micIsEnabled: this.enableMic,
         })
             .onError(function (config) {
                 console.log('error---', config);
@@ -540,7 +490,7 @@ class WebRTC {
                     dispatch({ type: 'screenshare_remove', name: content.name });
                     // Navbar Handle
                 } else if (msgType === 'media-presence' && typeof content.type === 'string' && typeof content.status === 'string') {
-                    console.log('WebRTC : ---------', content, msgType)
+                    console.log('WebRTC : ---------', content, msgType);
                 } else if (msgType === 'debug') {
                     console.log(msgType, peerId, content);
                 } else if (msgType === 'mic-control' && typeof content.enabled === 'boolean') {
@@ -609,7 +559,7 @@ class WebRTC {
                     WebRTC.getInstance().client.sendPeerMessage({ rtcId: peerId }, 'screenshare-position', screenshare);
                     WebRTC.getInstance().client.sendPeerMessage({ rtcId: peerId }, 'screenshare-change', screenshare);
                 });
-                
+
                 // if (WebRTC.getInstance().client)
                 //     WebRTC.getInstance().client.sendPeerMessage({ room: WebRTC.getInstance().roomName }, 'media-presence', {
                 //         type: 'screenshare',
