@@ -275,13 +275,13 @@ class WebRTC {
             for (const track of local.getTracks()) {
                 track.stop();
             }
-            this.stopTrack = true
-            return
+            // this.stopTrack = true
+            // return
         }
-        if (this.stopTrack) {
-            this.stopTrack = false
-            this.onStreamConfigurationChange()
-        }
+        this.onStreamConfigurationChange()
+        // if (this.stopTrack) {
+        //     this.stopTrack = false
+        // }
     }
     onStreamConfigurationChange() {
         this.updateStreamMode();
@@ -304,7 +304,7 @@ class WebRTC {
                 const peer = peers[id];
                 if (peer.cancelled) continue;
                 peer.pc.getSenders().map((sender) => {
-                    console.log('sender : ---- ', sender)
+                    // console.log('sender : ---- ', sender)
                     sender.replaceTrack(
                         stream.getTracks().find((track) => {
                             return track.kind === sender.track.kind;
@@ -493,7 +493,8 @@ class WebRTC {
                     dispatch({ type: 'screenshare_remove', name: content.name });
                     // Navbar Handle
                 } else if (msgType === 'media-presence' && typeof content.type === 'string' && typeof content.status === 'string') {
-                    console.log('WebRTC : ---------', content, msgType);
+                    // console.log('WebRTC : ---------', content, msgType);
+                    // WebRTC.getInstance().onStreamConfigurationChange()
                 } else if (msgType === 'debug') {
                     console.log(msgType, peerId, content);
                 } else if (msgType === 'mic-control' && typeof content.enabled === 'boolean') {
