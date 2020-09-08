@@ -289,8 +289,11 @@ class WebRTC {
         navigator.mediaDevices.getUserMedia(this.currentContraintMode).then((stream) => {
             // replace local stream
             stream.getTracks().forEach((track) => {
+
                 local.addTrack(track);
             });
+            window.easyrtc.enableCamera(WebRTC.getInstance().enableCamera);
+            window.easyrtc.enableMicrophone(WebRTC.getInstance().enableMic);
 
             const video_me = document.getElementById(local.id);
             window.easyrtc.setVideoObjectSrc(video_me, stream);
@@ -301,7 +304,7 @@ class WebRTC {
                 const peer = peers[id];
                 if (peer.cancelled) continue;
                 peer.pc.getSenders().map((sender) => {
-                    
+                    console.log('sender : ---- ', sender)
                     sender.replaceTrack(
                         stream.getTracks().find((track) => {
                             return track.kind === sender.track.kind;
