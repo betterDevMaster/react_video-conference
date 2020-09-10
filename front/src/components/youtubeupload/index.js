@@ -85,7 +85,7 @@ const YoutubeUpload = React.memo((props) => {
         });
     };
     const toggleChange = () => {
-        console.log(youtubeMute)
+        // console.log(youtubeMute)
         if (youtubeMute === 'on') {
             if (videoRef.current) {
                 document.getElementById(youtubeMuteAudio).src = MicMute1;

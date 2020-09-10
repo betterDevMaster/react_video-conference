@@ -6,8 +6,8 @@ const templates = require('./email.templates')
 // The callback that is invoked when the user submits the form on the client.
 exports.collectEmail = (req, res) => {
   const { email, space } = req.body
-  console.log('---- email: ', email)
-  console.log('---- space: ', space)
+  // console.log('---- email: ', email)
+  // console.log('---- space: ', space)
   sendEmail(email, templates.confirm(space))
   res.json({ status: 0, msg: msgs.confirm })
   // User.findOne({ email, space })

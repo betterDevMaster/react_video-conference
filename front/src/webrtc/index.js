@@ -109,14 +109,14 @@ class WebRTC {
     }
     toggleCamera(enable) {
         window.easyrtc.enableCamera(enable);
-        this.enableCamera = enable;
+        this.enableCamera = enable
         this.handleHeaderToogle();
         if (this.client)
             this.client.sendPeerMessage({ room: this.roomName }, 'media-presence', { type: 'camera', status: enable ? 'on' : 'off' });
     }
     toggleMic(enable) {
         window.easyrtc.enableMicrophone(enable);
-        this.enableMic = enable;
+        this.enableMic = enable
         this.handleHeaderToogle();
         if (this.client)
             this.client.sendPeerMessage({ room: this.roomName }, 'media-presence', { type: 'mic', status: enable ? 'on' : 'off' });
@@ -271,17 +271,18 @@ class WebRTC {
     }
     handleHeaderToogle() {
         const local = window.easyrtc.getLocalStream();
+        // console.log('handleHaaderToogle : ', local.getTracks(), WebRTC.getInstance().enableCamera, WebRTC.getInstance().enableMic)
         if (!WebRTC.getInstance().enableCamera && !WebRTC.getInstance().enableMic) {
             for (const track of local.getTracks()) {
                 track.stop();
             }
-            // this.stopTrack = true
-            // return
+            this.stopTrack = true
+            return
         }
-        this.onStreamConfigurationChange()
-        // if (this.stopTrack) {
-        //     this.stopTrack = false
-        // }
+        if (this.stopTrack && WebRTC.getInstance().enableCamera) {
+            this.stopTrack = false
+            this.onStreamConfigurationChange()
+        }
     }
     onStreamConfigurationChange() {
         this.updateStreamMode();
@@ -289,11 +290,8 @@ class WebRTC {
         navigator.mediaDevices.getUserMedia(this.currentContraintMode).then((stream) => {
             // replace local stream
             stream.getTracks().forEach((track) => {
-
                 local.addTrack(track);
             });
-            window.easyrtc.enableCamera(WebRTC.getInstance().enableCamera);
-            window.easyrtc.enableMicrophone(WebRTC.getInstance().enableMic);
 
             const video_me = document.getElementById(local.id);
             window.easyrtc.setVideoObjectSrc(video_me, stream);
@@ -314,7 +312,7 @@ class WebRTC {
             }
         });
     }
-
+    
     async updateDevices() {
         try {
             let audio = [];
@@ -365,7 +363,7 @@ class WebRTC {
             micIsEnabled: this.enableMic,
         })
             .onError(function (config) {
-                console.log('error---', config);
+                // console.log('error---', config);
             })
             .onPeerMessage(function (client, peerId, msgType, content) {
                 if (msgType === 'chat') {
@@ -494,11 +492,10 @@ class WebRTC {
                     // Navbar Handle
                 } else if (msgType === 'media-presence' && typeof content.type === 'string' && typeof content.status === 'string') {
                     // console.log('WebRTC : ---------', content, msgType);
-                    // WebRTC.getInstance().onStreamConfigurationChange()
                 } else if (msgType === 'debug') {
-                    console.log(msgType, peerId, content);
+                    // console.log(msgType, peerId, content);
                 } else if (msgType === 'mic-control' && typeof content.enabled === 'boolean') {
-                    console.log(client, peerId, msgType, content);
+                    // console.log(client, peerId, msgType, content);
                     return;
                 } else if (msgType === 'audio-meter') {
                     // dispatch({type:'user_audio', value: {audio: content.rms});
@@ -527,11 +524,11 @@ class WebRTC {
                     });
                 } else {
                     // @todo FIXME: right now we don't have other messages to take care of
-                    console.log('peerMessage => got a peer message that is unexpected');
-                    console.log('            => peerId:  ' + peerId);
-                    console.log('            =>   name: ' + client.idToName(peerId));
-                    console.log('            => msgType: ' + msgType);
-                    console.log('            => content: ' + JSON.stringify(content));
+                    // console.log('peerMessage => got a peer message that is unexpected');
+                    // console.log('            => peerId:  ' + peerId);
+                    // console.log('            =>   name: ' + client.idToName(peerId));
+                    // console.log('            => msgType: ' + msgType);
+                    // console.log('            => content: ' + JSON.stringify(content));
                 }
             })
             .onStreamAccept(function (client, peerId, stream) {
@@ -546,7 +543,6 @@ class WebRTC {
                             type: 'user_add',
                             value: { id: peerId, name: peerName, stream, defPosX: position.x, defPosY: position.y }
                         });
-                        // WebRTC.getInstance().onStreamConfigurationChange();
                     },
                     function (errorCode, errorText) {}
                 );
@@ -590,6 +586,7 @@ class WebRTC {
                     function (msgType, position) {
                         dispatch({ type: 'user_add', value: { id: 'me', name: 'Me', stream, defPosX: position.x, defPosY: position.y } });
                         WebRTC.getInstance().onStreamConfigurationChange();
+                        // WebRTC.getInstance().onStreamConnect();
                         WebRTC.getInstance().client = client;
 
                         WebRTC.getInstance().updateMyPosition(position);

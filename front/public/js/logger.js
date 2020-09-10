@@ -8,7 +8,7 @@ const prettyMs = require('pretty-ms');
 class Logger {
   constructor() {
     // Retain a reference to the original console
-    console.log('=========logger working')
+    // console.log('=========logger working')
     this.originalConsole = window.console;
     this.timers = new Map([]);
     

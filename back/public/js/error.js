@@ -27,7 +27,7 @@ var ErrorMetric = {
      */
     log: function(message) {
         // @todo Using AJAX, post the message to config.telemetryUrl
-        console.log('[error] ' + message);
+        // console.log('[error] ' + message);
     }
 };
 
@@ -35,6 +35,6 @@ var ErrorMetric = {
 // @todo Send errors via AJAX to a database
 $(window).error(function(e) {
     var evt = e.originalEvent;
-    console.log('[error] ' + evt.filename + ':' + evt.lineno);
-    console.log('[error]   ' + evt.message);
+    // console.log('[error] ' + evt.filename + ':' + evt.lineno);
+    // console.log('[error]   ' + evt.message);
 });

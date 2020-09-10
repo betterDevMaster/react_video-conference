@@ -172,10 +172,6 @@ easyrtc.events.on("easyrtcMsg", function (
                 return peerPositions.indexOf(c) === peerId
             })
             return true
-        case "set_peer_stream":
-            console.log("set_peer_stream : ", message.msgData)
-            peerStreams.push(message.msgData)
-            return true
     }
 
     connectionObj.events.emitDefault(

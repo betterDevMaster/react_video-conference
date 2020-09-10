@@ -55,7 +55,7 @@ function VideoDialog(props){
         const calc_def_x = (Math.abs(-posMe.x) + Utils.width() / 2 ) / scaleMe
         const calc_def_y = (Math.abs(-posMe.y) + Utils.height() / 2 ) / scaleMe
 
-        console.log(calc_def_x, calc_def_y, posMe)  
+        // console.log(calc_def_x, calc_def_y, posMe)  
         dispatch({type: 'youtube_add', value:{name: videoId, id: 'me', username: 'me', value: videoId, width: videoWidth, 
             height: videoHeight, defX: calc_def_x, defY: calc_def_y, videoplay: true}})
         WebRTC.getInstance().youtubeAdd({videoId: videoId, name: videoId, username: 'me', width: videoWidth, 

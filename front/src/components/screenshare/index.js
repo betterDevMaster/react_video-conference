@@ -55,16 +55,16 @@ const ScreenShare = React.memo((props) => {
                     })
                     .catch(function (err) {
                         //log to console first
-                        console.log(err);
+                        // console.log(err);
                         if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
                             //required track is missing
-                            console.log('NotFoundError, DevicesNotFoundError');
+                            // console.log('NotFoundError, DevicesNotFoundError');
                         } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
                             //webcam or mic are already in use
-                            console.log('NotReadableError, TrackStartError');
+                            // console.log('NotReadableError, TrackStartError');
                         } else if (err.name === 'OverconstrainedError' || err.name === 'ConstraintNotSatisfiedError') {
                             //constraints can not be satisfied by avb. devices
-                            console.log('OverconstrainedError, ConstraintNotSatisfiedError');
+                            // console.log('OverconstrainedError, ConstraintNotSatisfiedError');
                         } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
                             //permission denied in browser
                             dispatch({
@@ -75,10 +75,10 @@ const ScreenShare = React.memo((props) => {
                             document.getElementById('screenshare').src = '/static/media/screenshare-off.44d81ce8.svg';
                         } else if (err.name === 'TypeError' || err.name === 'TypeError') {
                             //empty constraints object
-                            console.log('TypeError');
+                            // console.log('TypeError');
                         } else {
                             //other errors
-                            console.log('Error: ' + err.name);
+                            // console.log('Error: ' + err.name);
                         }
                     });
             } else {
